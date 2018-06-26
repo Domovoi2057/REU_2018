@@ -1,0 +1,10 @@
+.\sike.o: sike.c
+.\sike.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\string.h
+.\sike.o: random.h
+.\sike.o: fips202.h
+.\sike.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
+.\sike.o: P503_internal.h
+.\sike.o: config.h
+.\sike.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdbool.h
+.\sike.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stddef.h
+.\sike.o: P503_api.h
