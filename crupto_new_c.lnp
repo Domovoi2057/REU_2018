@@ -10,6 +10,7 @@
 ".\fips202.o"
 ".\test_mul.o"
 ".\mul.o"
+".\retarget_io.o"
 ".\startup_tm4c129.o"
 ".\system_tm4c129.o"
 --strict --scatter ".\crupto_new_c.sct"

@@ -394,968 +394,933 @@ void rdc_mont(const digit_t* ma, digit_t* mc)
 //  // ma is assumed to be in Montgomery representation.
 //    unsigned int i, j, carry, count = p503_ZERO_WORDS;
     digit_t UV[2], t = 0, u = 0, v = 0;
-		digit_t temp1;
-//    //for (i = 0; i < NWORDS_FIELD; i++) {
-//    //    mc[i] = 0;
-//    //}
-//	//test_loop(mc);	
-		//round 1
-		__asm("mov mc[0], ma[0]");//	round 1: ii=0, jj=0; there shouldn't be any initial carries, so the propagation is unnecessary and entire iteration can be written as a move op.
-		__asm("mov mc[1], ma[1]");//	round 1: ii=1, jj=0; there shouldn't be any initial carries, so the propagation is unnecessary and entire iteration can be written as a move op.
-		__asm("mov mc[2], ma[2]");//	round 1: ii=2, jj=1; there shouldn't be any initial carries, so the propagation is unnecessary and entire iteration can be written as a move op.
-		__asm("mov mc[3], ma[3]");//	round 1: ii=3, jj=2; there shouldn't be any initial carries, so the propagation is unnecessary and entire iteration can be written as a move op.
-		__asm("mov mc[4], ma[4]");//	round 1: ii=4, jj=3; there shouldn't be any initial carries, so the propagation is unnecessary and entire iteration can be written as a move op.
-		__asm("mov mc[5], ma[5]");//	round 1: ii=5, jj=4; there shouldn't be any initial carries, so the propagation is unnecessary and entire iteration can be written as a move op.
-		__asm("mov mc[6], ma[6]");//	round 1: ii=6, jj=5; there shouldn't be any initial carries, so the propagation is unnecessary and entire iteration can be written as a move op.
-		__asm("mov mc[7], ma[7]");//	round 1: ii=7, jj=6; there shouldn't be any initial carries, so the propagation is unnecessary and entire iteration can be written as a move op.
-		__asm("mov mc[8], ma[8]");//	round 1: ii=8, jj=7; there shouldn't be any initial carries, so the propagation is unnecessary and entire iteration can be written as a move op.
-
-		temp1 = ((digit_t*)p503p1)[9];
-		__asm("umull UV[0], UV[1], temp1, mc[0]");//	round 1: ii=9, jj=0; multiply 10th dgt of P503p1 w/ 1st dgt of C.
-		__asm("adds mc[9], UV[0], ma[9]");//	round 1: ii=9, jj=9; add LSB w/ 10th dgt of A. Store in 10th dgt of C. Set carry.
-		__asm("adcs v, UV[1], #0x00");//	add MSB w/ 0, store in v. Set carry.
-		__asm("adcs u, #0x00, #0x00");//	Add 0 to 0, to set carry flag. Store in u.
-		
-		temp1 = ((digit_t*)p503p1)[10];		
-		__asm("umull UV[0], UV[1], temp1, mc[0]");// round 1: ii=10, jj=0; multiply 11th dgt of P503p1 w/ 1st dgt of C.
-		__asm("adds v, v, UV[0]");// add LSB to v, store in v.
-		__asm("adcs u, u, UV[1]");// add MSB to u, store in u.
-		__asm("adcs t, #0x00, #0x00");//	place carry in t.
-
-		temp1 = ((digit_t*)p503p1)[9];
-		__asm("umull UV[0], UV[1], temp1, mc[1]");//	round 1: ii=10, jj=1; multiply 10th dgt of P503p1 w/ 2nd dgt of C.
-		__asm("adds v, v, UV[0]");//	add LSB to v, store in v.
-		__asm("adcs u, u, UV[1]");//	add MSB to u, store in u.
-		__asm("adcs t, t, #0x00");//	add carry to t.
-		
-		__asm("adds mc[10], v, ma[10]");//	round 1: ii=10, jj=10; add 11th dgt of A to v, store in 11th dgt of C.
-		__asm("adcs v, u, #0x00");//	add carry to u, store sum in v. Propagate carry.
-		__asm("adcs u, t, #0x00");//	add carry to t, store sum in u.
-		__asm("mov t, #0x00");//	set t to zero.
-		
-		
-		temp1 = ((digit_t*)p503p1)[11];		
-		__asm("umull UV[0], UV[1], temp1, mc[0]");//	round 1: ii=11, jj=0; multiply 12th dgt of P503p1 w/ 1st dgt of C.
-		__asm("adds v, v, UV[0]");//	add LSB to v, store in v.
-		__asm("adcs u, u, UV[1]");//	add MSB to u, store in u.
-		__asm("adcs t, t, #0x00");//	add carry to t.
-
-		temp1 = ((digit_t*)p503p1)[10];
-		__asm("umull UV[0], UV[1], temp1, mc[1]");//	round 1: ii=11, jj=1; multiply 11th digit of P503p1 w/ 2nd digit of C.
-		__asm("adds v, v, UV[0]");//	add LSB to v, store in v.
-		__asm("adcs u, u, UV[1]");// add MSB to u, store in u.
-		__asm("adcs t, t, #0x00");//	add carry to t.
-
-		temp1 = ((digit_t*)p503p1)[9];
-		__asm("umull UV[0], UV[1], temp1, mc[2]");//	round 1: ii=11, jj=2; multiply 10th dgt of p503p1 w/ 3rd dgt of C.
-		__asm("adds v, v, UV[0]");//	add LSB to v, store in v.
-		__asm("adcs u, u, UV[1]");//	add MSB to u, store in u.
-		__asm("adcs t, t, #0x00");// add carry to t.
-		
-		__asm("adds mc[11], v, ma[11]");//	round 1: ii=11, jj=11; add v to 12th dgt of A, store in 12th dgt of C.
-		__asm("adcs v, u, #0x00");//	add carry to u, store sum in v. Propagate carry.
-		__asm("adcs u, t, #0x00");// add carry to t, store sum in u. Propagate carry.
-		__asm("mov t, #0x00");//	set t to zero.
-		
-
-		temp1 = ((digit_t*)p503p1)[12];
-		__asm("umull UV[0], UV[1], temp1, mc[0]");//	round 1: ii=12, jj=0; multiply 13th dgt of p503p1 w/ 1st dgt of C.
-		__asm("adds v, v, UV[0]");//	add LSB to v, store in v.
-		__asm("adcs u, u, UV[1]");//	add MSB to u, store in u.
-		__asm("adcs t, t, #0x00");//	add carry to t, store in t.
-
-		temp1 = ((digit_t*)p503p1)[11];
-		__asm("umull UV[0], UV[1], temp1, mc[1]");//	round 1: ii=12, jj=1; multiply 12th dgt of p503p1 w/ 2nd dgt of C.
-		__asm("adds v, v, UV[0]");//	add LSB to v, store in v.
-		__asm("adcs u, u, UV[1]");//	add MSB to u, store in u.
-		__asm("adcs t, t, #0x00");//	add carry to t, store in t.
-
-		temp1 = ((digit_t*)p503p1)[10];
-		__asm("umull UV[0], UV[1], temp1, mc[2]");//	round 1: ii=12, jj=2; multiply 11th dgt of p503p1 w/ 3rd dgt of C.
-		__asm("adds v, v, UV[0]");//	add LSB to v, store in v.
-		__asm("adcs u, u, UV[1]");//	add MSB to u, store in u.
-		__asm("adcs t, t, #0x00");//	add carry to t, store in t.
-
-		temp1 = ((digit_t*)p503p1)[9];
-		__asm("umull UV[0], UV[1], temp1, mc[3]");//	round 1: ii=12, jj=3; multiply 10th dgt of p503p1 w/ 4th dgt of C.
-		__asm("adds v, v, UV[0]");//	add LSB to v, store in v.
-		__asm("adcs u, u, UV[1]");//	add MSB to u, store in u.
-		__asm("adcs t, t, #0x00");//	add carry to t, store in t.
-		
-		__asm("adds mc[12], v, ma[12]");//	round 1: ii=12, jj=12; add 13th dgt of A to v, store in 13th dgt of C.
-		__asm("adcs v, u, #0x00");//	add carry to u, store sum in v.
-		__asm("adcs u, t, #0x00");// add carry to t, store in u.
-		__asm("mov t, #0x00");//	set t to zero.
-		
-		
-		temp1 = ((digit_t*)p503p1)[13];		
-		__asm("umull UV[0], UV[1], temp1, mc[0]");//	round 1: ii=13, jj=0;	multiply 14th dgt of p503p1 w/ 1st dgt of C.
-		__asm("adds v, v, UV[0]");//	add LSB to v, store in v.
-		__asm("adcs u, u, UV[1]");//	add MSB to u, store in u.
-		__asm("adcs t, t, #0x00");//	add carry to t, store in t.
+		//digit_t temp1;
+		//int ii = 0;
 	
-		temp1 = ((digit_t*)p503p1)[12];	
-		__asm("umull UV[0], UV[1], temp1, mc[1]");//	round 1: ii=13, jj=1; multiply 13th dgt of p503p1 w/ 2nd dgt of C.
-		__asm("adds v, v, UV[0]");//	add LSB to v, store in v.
-		__asm("adcs u, u, UV[1]");//	add MSB to u, store in u.
-		__asm("adcs t, t, #0x00");//	add carry to t, store in t.
-		
-		temp1 = ((digit_t*)p503p1)[11];
-		__asm("umull UV[0], UV[1], temp1, mc[2]");//	round 1: ii=13, jj=2; multiply 12th dgt of p503p1 w/ 3rd dgt of C.
-		__asm("adds v, v, UV[0]");//	add LSB to v, store in v.
-		__asm("adcs u, u, UV[1]");//	add MSB to u, store in u.
-		__asm("adcs t, t, #0x00");//	add carry to t, store in t.
-		
-		temp1 = ((digit_t*)p503p1)[10];		
-		__asm("umull UV[0], UV[1], temp1, mc[3]");//	round 1: ii=13, jj=3; multiply 11th dgt of p503p1 w/ 4th dgt of C.
-		__asm("adds v, v, UV[0]");//	add LSB to v, store in v.
-		__asm("adcs u, u, UV[1]");//	add MSB to u, store in u.
-		__asm("adcs t, t, #0x00");//	add carry to t, store in t.
 
-		temp1 = ((digit_t*)p503p1)[9];
-		__asm("umull UV[0], UV[1], temp1, mc[4]");//	round 1: ii=13, jj=4; multiply 10th dgt of p503p1 w/ 5th dgt of C.
-		__asm("adds v, v, UV[0]");//	add LSB to v, store in v.
-		__asm("adcs u, u, UV[1]");//	add MSB to u, store in u.
-		__asm("adcs t, t, #0x00");//	add carry to t, store in t.
-		
-		__asm("adds mc[13], v, ma[13]");//	round 1: ii=13, jj=13; add v to 14th dgt of A, store in 14th dgt of C.
-		__asm("adcs v, u, #0x00");//	add carry to u, store sum in v.
-		__asm("adcs u, t, #0x00");//	add carry to t, store sum in u.
-		__asm("mov t, #0x00");// set t to zero.
+//		__asm("mov mc[7], #0");//	clear values for mc
+//		__asm("mov mc[8], #0");
+//		__asm("mov mc[9], #0");
+//		__asm("mov mc[10], #0");
+//		__asm("mov mc[11], #0");
+//		__asm("mov mc[12], #0");
+//		__asm("mov mc[13], #0");
+//		__asm("mov mc[14], #0");		
+//		__asm("mov mc[15], #0");
 		
 		
-		temp1 = ((digit_t*)p503p1)[14];		
-		__asm("umull UV[0], UV[1], temp1, mc[0]");//	round 1: ii=14, jj=0; multiply 15th dgt of p503p1 w/ 1st dgt of C.
-		__asm("adds v, v, UV[0]");//	add LSB to v, store in v.
-		__asm("adcs u, u, UV[1]");//	add MSB to u, store in u.
-		__asm("adcs t, t, #0x00");// add carry to t, store in t.
-
-		temp1 = ((digit_t*)p503p1)[13];
-		__asm("umull UV[0], UV[1], temp1, mc[1]");//	round 1: ii=14, jj=1; multiply 14th dgt of p503p1 w/ 2nd dgt of C.
-		__asm("adds v, v, UV[0]");//	add LSB to v, store in v.
-		__asm("adcs u, u, UV[1]");//	add MSB to u, store in u.
-		__asm("adcs t, t, #0x00");//	add carry to t, store in t.
-
-		temp1 = ((digit_t*)p503p1)[12];
-		__asm("umull UV[0], UV[1], temp1, mc[2]");//	round 1: ii=14, jj=2; multiply 13th dgt of p503p1 w/ 3rd dgt of C.
-		__asm("adds v, v, UV[0]");//	add LSB to v, store in v.
-		__asm("adcs u, u, UV[1]");// add MSB to u, store in u.
-		__asm("adcs t, t, #0x00");//	 add carry to t, store in t.
-
-		temp1 = ((digit_t*)p503p1)[11];
-		__asm("umull UV[0], UV[1], temp1, mc[3]");//	round 1: ii=14, jj=3; multiply 12th dgt of p503p1 w/ 4th dgt of C.
-		__asm("adds v, v, UV[0]");// add LSB to v, store in v.
-		__asm("adcs u, u, UV[1]");//	add MSB to u, store in u.
-		__asm("adcs t, t, #0x00");//	add carry to t, store in t.
-
-		temp1 = ((digit_t*)p503p1)[10];
-		__asm("umull UV[0], UV[1], temp1, mc[4]");//	round 1: ii=14, jj=4; multiply 11th dgt of p503p1 w/ 5th dgt of C.
-		__asm("adds v, v, UV[0]");// add LSB to v, store in v.
-		__asm("adcs u, u, UV[1]");// add MSB to u, store in u.
-		__asm("adcs t, t, #0x00");//	add carry to t, store in t.
-
-		temp1 = ((digit_t*)p503p1)[9];
-		__asm("umull UV[0], UV[1], temp1, mc[5]");// round 1: ii=14, jj=5; muiltiply 10th dgt of p503p1 w/ 6th dgt of C.
-		__asm("adds v, v, UV[0]");//	add LSB to v, store in v.
-		__asm("adcs u, u, UV[1]");//	add MSB to u, store in u.
-		__asm("adcs t, t, #0x00");//	add carry to t, store in t.
-		
-		__asm("adds mc[14], v, ma[14]");//	round 1: ii=14, jj=14; add 15th dgt of A to v, store in 15th dgt of C.
-		__asm("adcs v, u, #0x00");//	add carry to u, store in v.
-		__asm("adcs u, t, #0x00");//	add carry to t, store in u.
-		__asm("mov t, #0x00");//	set t to zero.
+		__asm("mov mc[0], ma[0]");//	store lower bits of ma into mc.
+		__asm("mov mc[1], ma[1]");
+		__asm("mov mc[2], ma[2]");
+		__asm("mov mc[3], ma[3]");
+		__asm("mov mc[4], ma[4]");
+		__asm("mov mc[5], ma[5]");
+		__asm("mov mc[6], ma[6]");
 		
 		
-		temp1 = ((digit_t*)p503p1)[15];		
-		__asm("umull UV[0], UV[1], temp1, mc[0]");//	round 1: ii=15, jj=0; multiply 16th dgt of p503p1 w/ 1st dgt of C.
-		__asm("adds v, v, UV[0]");//	add LSB to v, store in v.
-		__asm("adcs u, u, UV[1]");//	add MSB to u, store in u.
-		__asm("adcs t, t, #0x00");//	add carry to t, store in t.
-
-		temp1 = ((digit_t*)p503p1)[14];
-		__asm("umull UV[0], UV[1], temp1, mc[1]");//	round 1: ii=15, jj=1; multiply 15th dgt of p503p1 w/ 2nd dgt of C.
-		__asm("adds v, v, UV[0]");//	add LSB to v, store in v.
-		__asm("adcs u, u, UV[1]");//	add MSB to u, store in u.
-		__asm("adcs t, t, #0x00");//	add carry to t, store in t.
-
-		temp1 = ((digit_t*)p503p1)[13];
-		__asm("umull UV[0], UV[1], temp1, mc[2]");//	round 1: ii=15, jj=2; multiply 14th dgt of p503p1 w/ 3rd dgt of C.
-		__asm("adds v, v, UV[0]");//	add LSB to v, store in v.
-		__asm("adcs u, u, UV[1]");//	add MSB to u, store in u.
-		__asm("adcs t, t, #0x00");//	add carry to t, store in t.
-		
-		temp1 = ((digit_t*)p503p1)[12];		
-		__asm("umull UV[0], UV[1], temp1, mc[3]");//	round 1: ii=15, jj=3; multiply 13th dgt of p503p1 w/ 4th dgt of C.
-		__asm("adds v, v, UV[0]");//	add LSB to v, store in v.
-		__asm("adcs u, u, UV[1]");// add MSB to u, store in u.
-		__asm("adcs t, t, #0x00");//	add carry to t, store in t.
-
-		temp1 = ((digit_t*)p503p1)[11];
-		__asm("umull UV[0], UV[1], temp1, mc[4]");//	round 1: ii=15, jj=4; multiply 12th dgt of p503p1 w/ 5th dgt of C.
-		__asm("adds v, v, UV[0]");//	add LSB to v, store in v.
-		__asm("adcs u, u, UV[1]");//	add MSB to u, store in u.
-		__asm("adcs t, t, #0x00");//	add carry to t, store in t.
-
-		temp1 = ((digit_t*)p503p1)[10];
-		__asm("umull UV[0], UV[1], temp1, mc[5]");//	round 1: ii=15, jj=5; multiply 11th dgt of p503p1 w/ 6th dgt of C.
-		__asm("adds v, v, UV[0]");//	add LSB to v, store in v.
-		__asm("adcs u, u, UV[1]");//	add MSB to u, store in u.
-		__asm("adcs t, t, #0x00");//	add carry to t, store in t.
-		
-		temp1 = ((digit_t*)p503p1)[9];		
-		__asm("umull UV[0], UV[1], temp1, mc[6]");//	round 1: ii=15, jj=6; multiply 10th dgt of p503p1 w/ 7th dgt of C.
-		__asm("adds v, v, UV[0]");//	add LSB to v, store in v.
-		__asm("adcs u, u, UV[1]");//	add MSB to u, store in u.
-		__asm("adcs t, t, #0x00");//	add carry to t, store in t.
-		
-		__asm("adds mc[15], v, ma[15]");//	round 1: ii=15, jj=15; add 16th dgt of A to v, store in 16th dgt of C.
-		__asm("adcs v, u, #0x00");//	add carry to u, store in v.
-		__asm("adcs u, t, #0x00");//	add carry to t, store in u.
-		__asm("mov t, #0x00");//	set t to zero.
+		//ma{7] iteration
+		__asm("umull UV[0], UV[1], ma[0], ((digit_t*)p503p1)[0]");// LSB in UV[0], MSB in UV[1].
+		__asm("adds v, UV[0], ma[7]");
+		__asm("adcs u, UV[1], u");
+		__asm("adcs t, #0, #0");
+		__asm("add mc[7], #0, v");
 		
 		
-		temp1 = ((digit_t*)p503p1)[15];		
-		__asm("umull UV[0], UV[1], temp1, mc[1]");//	round 2: ii=16, jj=1; multiply 16th dgt of p503p1 w/ 2nd dgt of C.
-		__asm("adds v, v, UV[0]");//	add LSB to v, store in v.
-		__asm("adcs u, u, UV[1]");//	add MSB to u, store in u.
-		__asm("adcs t, t, #0x00");//	add carry to t, store in t.
-
-		temp1 = ((digit_t*)p503p1)[14];
-		__asm("umull UV[0], UV[1], temp1, mc[2]");//	round 2: ii=16, jj=2; multiply 15th dgt of p503p1 w/ 3rd dgt of C.
-		__asm("adds v, v, UV[0]");//	add LSB to v, store in v.
-		__asm("adcs u, u, UV[1]");//	add MSB to u, store in u.
-		__asm("adcs t, t, #0x00");//	add carry to t, store in t.
-
-		temp1 = ((digit_t*)p503p1)[13];
-		__asm("umull UV[0], UV[1], temp1, mc[3]");//	round 2: ii=16, jj=3; multiply 14th dgt of p503p1 w/ 4th dgt of C.
-		__asm("adds v, v, UV[0]");//	add LSB to v, store in v.
-		__asm("adcs u, u, UV[1]");//	add MSB to u, store in u.
-		__asm("adcs t, t, #0x00");//	add carry to t, store in t.
-
-		temp1 = ((digit_t*)p503p1)[12];
-		__asm("umull UV[0], UV[1], temp1, mc[4]");//	round 2: ii=16, jj=4; multiply 13th dgt of p503p1 w/ 5th dgt of C.
-		__asm("adds v, v, UV[0]");//	add LSB to v, store in v.
-		__asm("adcs u, u, UV[1]");//	add MSB to u, store in u.
-		__asm("adcs t, t, #0x00");//	add carry to t, store in t.
-
-		temp1 = ((digit_t*)p503p1)[11];
-		__asm("umull UV[0], UV[1], temp1, mc[5]");//	round 2: ii=16, jj=5; multiply 12th dgt of p503p1 w/ 6th dgt of C.
-		__asm("adds v, v, UV[0]");//	add LSB to v, store in v.
-		__asm("adcs u, u, UV[1]");//	add MSB to u, store in u.
-		__asm("adcs t, t, #0x00");//	add carry to t, store in t.
-
-		temp1 = ((digit_t*)p503p1)[10];
-		__asm("umull UV[0], UV[1], temp1, mc[6]");//	round 2: ii=16, jj=6; multiply 11th dgt of p503p1 w/ 7th dgt of C.
-		__asm("adds v, v, UV[0]");//	add LSB to v, store in v.
-		__asm("adcs u, u, UV[1]");//	add MSB to u, store in u.
-		__asm("adcs t, t, #0x00");//	add carry to t, store in t.
-
-		temp1 = ((digit_t*)p503p1)[9];
-		__asm("umull UV[0], UV[1], temp1, mc[7]");//	round 2: ii=16, jj=7; multiply 10th dgt of p503p1 w/ 8th dgt of C.
-		__asm("adds v, v, UV[0]");//	add LSB to v, store in v.
-		__asm("adcs u, u, UV[1]");//	add MSB to u, store in u.
-		__asm("adcs t, t, #0x00");//	add carry to t, store in t.
-	
-		temp1 = ((digit_t*)p503p1)[8];	
-		__asm("umull UV[0], UV[1], temp1, mc[8]");//	round 2: ii=16, jj=8; multiply 9th dgt of p503p1 w/ 9th dgt of C.
-		__asm("adds v, v, UV[0]");//	add LSB to v, store in v.
-		__asm("adcs u, u, UV[1]");//	add MSB to u, store in u.
-		__asm("adcs t, t, #0x00");//	add carry to t, store in t.
-
-		temp1 = ((digit_t*)p503p1)[7];
-		__asm("umull UV[0], UV[1], temp1, mc[9]");//	round 2: ii=16, jj=9; multiply 8th dgt of p503p1 w/ 10th dgt of C.
-		__asm("adds v, v, UV[0]");//	add LSB to v, store in v.
-		__asm("adcs u, u, UV[1]");//	add MSB to u, store in u.
-		__asm("adcs t, t, #0x00");//	add carry to t, store in t.
-
-		__asm("adds mc[0], v, ma[16]");//	round 2: ii=16, jj=16;;	add v to 17th dgt of A, store in 1st dgt of C.
-		__asm("adcs v, u, #0x00");//	add carry to u, store in v.
-		__asm("adcs u, t, #0x00");//	add carry to t, store in u.
-		__asm("mov t, #0x00");//	set t to zero.
+		//ma[8] iteration
+		__asm("umull UV[0], UV[1], ma[0], ((digit_t*)p503p1)[1]");
+		__asm("adds u, UV[0], u");
+		__asm("adcs t, UV[1], t");
+		__asm("adcs v, #0, #0");
+		
+		__asm("umull UV[0], UV[1], ma[1], ((digit_t*)p503p1)[0]");
+		__asm("adds u, UV[0], u");
+		__asm("adcs t, UV[1], t");
+		__asm("adcs v, #0, v");
+		
+		__asm("adds u, ma[8], u");
+		__asm("adcs t, #0, t");
+		__asm("adcs v, #0, v");
+		__asm("add mc[8], #0, u");
 		
 		
-		temp1 = ((digit_t*)p503p1)[15];		
-		__asm("umull UV[0], UV[1], temp1, mc[2]");//	round 2: ii=17, jj=2;	multiply 16th dgt of p503p1 w/ 3rd dgt of C.
-		__asm("adds v, v, UV[0]");//	add LSB to v, store in v.
-		__asm("adcs u, u, UV[1]");//	add MSB to u, store in u.
-		__asm("adcs t, t, #0x00");//	add carry to t, store in t.
+		//ma[9] iteration
 		
-		temp1 = ((digit_t*)p503p1)[14];		
-		__asm("umull UV[0], UV[1], temp1, mc[3]");//	round 2: ii=17, jj=3;	multiply 15th dgt of p503p1 w/ 4th dgt of C.
-		__asm("adds v, v, UV[0]");//	add LSB to v, store in v.
-		__asm("adcs u, u, UV[1]");//	add MSB to u, store in u.
-		__asm("adcs t, t, #0x00");//	add carry to t, store in t.
-
-		temp1 = ((digit_t*)p503p1)[13];
-		__asm("umull UV[0], UV[1], temp1, mc[4]");//	round 2: ii=17, jj=4;	multiply 14th dgt of p503p1 w/ 5th dgt of C.
-		__asm("adds v, v, UV[0]");//	add LSB to v, store in v.
-		__asm("adcs u, u, UV[1]");//	add MSB to u, store in u.
-		__asm("adcs t, t, #0x00");//	add carry to t, store in t.
-
-		temp1 = ((digit_t*)p503p1)[12];
-		__asm("umull UV[0], UV[1], temp1, mc[5]");//	round 2: ii=17, jj=5;	multiply 13th dgt of p503p1 w/ 6th dgt of C.
-		__asm("adds v, v, UV[0]");//	add LSB to v, store in v.
-		__asm("adcs u, u, UV[1]");//	add MSB to u, store in u.
-		__asm("adcs t, t, #0x00");//	add carry to t, store in t.		
-
-		temp1 = ((digit_t*)p503p1)[11];
-		__asm("umull UV[0], UV[1], temp1, mc[6]");//	round 2: ii=17, jj=6;	multiply 12th dgt of p503p1 w/ 7th dgt of C.
-		__asm("adds v, v, UV[0]");//	add LSB to v, store in v.
-		__asm("adcs u, u, UV[1]");//	add MSB to u, store in u.
-		__asm("adcs t, t, #0x00");//	add carry to t, store in t.		
+		__asm("umull UV[0], UV[1], ma[0], ((digit_t*)p503p1)[2]");
+		__asm("adds t, UV[0], t");
+		__asm("adcs v, UV[1], v");
+		__asm("adcs u, #0, #0");
 		
-		temp1 = ((digit_t*)p503p1)[10];		
-		__asm("umull UV[0], UV[1], temp1, mc[7]");//	round 2: ii=17, jj=7;	multiply 11th dgt of p503p1 w/ 8th dgt of C.
-		__asm("adds v, v, UV[0]");//	add LSB to v, store in v.
-		__asm("adcs u, u, UV[1]");//	add MSB to u, store in u.
-		__asm("adcs t, t, #0x00");//	add carry to t, store in t.		
+		__asm("umull UV[0], UV[1], ma[1], ((digit_t*)p503p1)[1]");
+		__asm("adds t, UV[0], t");
+		__asm("adcs v, UV[1], v");
+		__asm("adcs u, #0, u");
 		
-		temp1 = ((digit_t*)p503p1)[9];		
-		__asm("umull UV[0], UV[1], temp1, mc[8]");//	round 2: ii=17, jj=8;	multiply 10th dgt of p503p1 w/ 9th dgt of C.
-		__asm("adds v, v, UV[0]");//	add LSB to v, store in v.
-		__asm("adcs u, u, UV[1]");//	add MSB to u, store in u.
-		__asm("adcs t, t, #0x00");//	add carry to t, store in t.		
-
-		temp1 = ((digit_t*)p503p1)[8];
-		__asm("umull UV[0], UV[1], temp1, mc[9]");//	round 2: ii=17, jj=9;	multiply 9th dgt of p503p1 w/ 10th dgt of C.
-		__asm("adds v, v, UV[0]");//	add LSB to v, store in v.
-		__asm("adcs u, u, UV[1]");//	add MSB to u, store in u.
-		__asm("adcs t, t, #0x00");//	add carry to t, store in t.	
-
-		temp1 = ((digit_t*)p503p1)[7];
-		__asm("umull UV[0], UV[1], temp1, mc[10]");//	round 2: ii=17, jj=10;	multiply 8th dgt of p503p1 w/ 11th dgt of C.
-		__asm("adds v, v, UV[0]");//	add LSB to v, store in v.
-		__asm("adcs u, u, UV[1]");//	add MSB to u, store in u.
-		__asm("adcs t, t, #0x00");//	add carry to t, store in t.
+		__asm("umull UV[0], UV[1], ma[2], ((digit_t*)p503p1)[0]");
+		__asm("adds t, UV[0], t");
+		__asm("adcs v, UV[1], v");
+		__asm("adcs u, #0, u");
 		
-		__asm("adds mc[1], v, ma[17]");//	round 2: ii=17, jj=16;;	add v to 18th dgt of A, store in 2nd dgt of C.
-		__asm("adcs v, u, #0x00");//	add carry to u, store in v.
-		__asm("adcs u, t, #0x00");//	add carry to t, store in u.
-		__asm("mov t, #0x00");//	set t to zero.
-
-
-		temp1 = ((digit_t*)p503p1)[15];
-		__asm("umull UV[0], UV[1], temp1, mc[3]");//	round 2: ii=18, jj=3;	multiply 16th dgt of p503p1 w/ 4th dgt of C.
-		__asm("adds v, v, UV[0]");//	add LSB to v, store in v.
-		__asm("adcs u, u, UV[1]");//	add MSB to u, store in u.
-		__asm("adcs t, t, #0x00");//	add carry to t, store in t.
-		
-		temp1 = ((digit_t*)p503p1)[14];		
-		__asm("umull UV[0], UV[1], temp1, mc[4]");//	round 2: ii=18, jj=4;	multiply 15th dgt of p503p1 w/ 5th dgt of C.
-		__asm("adds v, v, UV[0]");//	add LSB to v, store in v.
-		__asm("adcs u, u, UV[1]");//	add MSB to u, store in u.
-		__asm("adcs t, t, #0x00");//	add carry to t, store in t.	
-
-		temp1 = ((digit_t*)p503p1)[13];
-		__asm("umull UV[0], UV[1], temp1, mc[5]");//	round 2: ii=18, jj=5;	multiply 14th dgt of p503p1 w/ 6th dgt of C.
-		__asm("adds v, v, UV[0]");//	add LSB to v, store in v.
-		__asm("adcs u, u, UV[1]");//	add MSB to u, store in u.
-		__asm("adcs t, t, #0x00");//	add carry to t, store in t.
-		
-		temp1 = ((digit_t*)p503p1)[12];		
-		__asm("umull UV[0], UV[1], temp1, mc[6]");//	round 2: ii=18, jj=6;	multiply 13th dgt of p503p1 w/ 7th dgt of C.
-		__asm("adds v, v, UV[0]");//	add LSB to v, store in v.
-		__asm("adcs u, u, UV[1]");//	add MSB to u, store in u.
-		__asm("adcs t, t, #0x00");//	add carry to t, store in t.	
-
-		temp1 = ((digit_t*)p503p1)[11];
-		__asm("umull UV[0], UV[1], temp1, mc[7]");//	round 2: ii=18, jj=7;	multiply 12th dgt of p503p1 w/ 8th dgt of C.
-		__asm("adds v, v, UV[0]");//	add LSB to v, store in v.
-		__asm("adcs u, u, UV[1]");//	add MSB to u, store in u.
-		__asm("adcs t, t, #0x00");//	add carry to t, store in t.
-		
-		temp1 = ((digit_t*)p503p1)[10];		
-		__asm("umull UV[0], UV[1], temp1, mc[8]");//	round 2: ii=18, jj=8;	multiply 11th dgt of p503p1 w/ 9th dgt of C.
-		__asm("adds v, v, UV[0]");//	add LSB to v, store in v.
-		__asm("adcs u, u, UV[1]");//	add MSB to u, store in u.
-		__asm("adcs t, t, #0x00");//	add carry to t, store in t.
-
-		temp1 = ((digit_t*)p503p1)[9];
-		__asm("umull UV[0], UV[1], temp1, mc[9]");//	round 2: ii=18, jj=9;	multiply 10th dgt of p503p1 w/ 10 dgt of C.
-		__asm("adds v, v, UV[0]");//	add LSB to v, store in v.
-		__asm("adcs u, u, UV[1]");//	add MSB to u, store in u.
-		__asm("adcs t, t, #0x00");//	add carry to t, store in t.
-		
-		temp1 = ((digit_t*)p503p1)[8];		
-		__asm("umull UV[0], UV[1], temp1, mc[10]");//	round 2: ii=18, jj=10;	multiply 9th dgt of p503p1 w/ 11th dgt of C.
-		__asm("adds v, v, UV[0]");//	add LSB to v, store in v.
-		__asm("adcs u, u, UV[1]");//	add MSB to u, store in u.
-		__asm("adcs t, t, #0x00");//	add carry to t, store in t.
-
-		temp1 = ((digit_t*)p503p1)[7];
-		__asm("umull UV[0], UV[1], temp1, mc[11]");//	round 2: ii=18, jj=11;	multiply 8th dgt of p503p1 w/ 12th dgt of C.
-		__asm("adds v, v, UV[0]");//	add LSB to v, store in v.
-		__asm("adcs u, u, UV[1]");//	add MSB to u, store in u.
-		__asm("adcs t, t, #0x00");//	add carry to t, store in t.
-			
-		__asm("adds mc[2], v, ma[18]");//	round 2: ii=18, jj=16;	add v to 19th dgt of A, store in 3rd dgt of C.
-		__asm("adcs v, u, #0x00");//	add carry to u, store in v.
-		__asm("adcs u, t, #0x00");//	add carry to t, store in u.
-		__asm("mov t, #0x00");//	set t to zero.
-
-
-		temp1 = ((digit_t*)p503p1)[15];
-		__asm("umull UV[0], UV[1], temp1, mc[4]");//	round 2: ii=19, jj=4;	multiply 16th dgt of p503p1 w/ 5th dgt of C.
-		__asm("adds v, v, UV[0]");//	add LSB to v, store in v.
-		__asm("adcs u, u, UV[1]");//	add MSB to u, store in u.
-		__asm("adcs t, t, #0x00");//	add carry to t, store in t.
-
-		temp1 = ((digit_t*)p503p1)[14];
-		__asm("umull UV[0], UV[1], temp1, mc[5]");//	round 2: ii=19, jj=5;	multiply 15th dgt of p503p1 w/ 6th dgt of C.
-		__asm("adds v, v, UV[0]");//	add LSB to v, store in v.
-		__asm("adcs u, u, UV[1]");//	add MSB to u, store in u.
-		__asm("adcs t, t, #0x00");//	add carry to t, store in t.
-
-		temp1 = ((digit_t*)p503p1)[13];
-		__asm("umull UV[0], UV[1], temp1, mc[6]");//	round 2: ii=19, jj=6;	multiply 14th dgt of p503p1 w/ 7th dgt of C.
-		__asm("adds v, v, UV[0]");//	add LSB to v, store in v.
-		__asm("adcs u, u, UV[1]");//	add MSB to u, store in u.
-		__asm("adcs t, t, #0x00");//	add carry to t, store in t.		
-
-		temp1 = ((digit_t*)p503p1)[12];
-		__asm("umull UV[0], UV[1], temp1, mc[7]");//	round 2: ii=19, jj=7;	multiply 13th dgt of p503p1 w/ 8th dgt of C.
-		__asm("adds v, v, UV[0]");//	add LSB to v, store in v.
-		__asm("adcs u, u, UV[1]");//	add MSB to u, store in u.
-		__asm("adcs t, t, #0x00");//	add carry to t, store in t.		
-
-		temp1 = ((digit_t*)p503p1)[11];
-		__asm("umull UV[0], UV[1], temp1, mc[8]");//	round 2: ii=19, jj=8;	multiply 12th dgt of p503p1 w/ 9th dgt of C.
-		__asm("adds v, v, UV[0]");//	add LSB to v, store in v.
-		__asm("adcs u, u, UV[1]");//	add MSB to u, store in u.
-		__asm("adcs t, t, #0x00");//	add carry to t, store in t.		
-		
-		temp1 = ((digit_t*)p503p1)[10];		
-		__asm("umull UV[0], UV[1], temp1, mc[9]");//	round 2: ii=19, jj=9;	multiply 11th dgt of p503p1 w/ 10th dgt of C.
-		__asm("adds v, v, UV[0]");//	add LSB to v, store in v.
-		__asm("adcs u, u, UV[1]");//	add MSB to u, store in u.
-		__asm("adcs t, t, #0x00");//	add carry to t, store in t.
-
-		temp1 = ((digit_t*)p503p1)[9];
-		__asm("umull UV[0], UV[1], temp1, mc[10]");//	round 2: ii=19, jj=10;	multiply 10th dgt of p503p1 w/ 11th dgt of C.
-		__asm("adds v, v, UV[0]");//	add LSB to v, store in v.
-		__asm("adcs u, u, UV[1]");//	add MSB to u, store in u.
-		__asm("adcs t, t, #0x00");//	add carry to t, store in t.
-
-		temp1 = ((digit_t*)p503p1)[8];
-		__asm("umull UV[0], UV[1], temp1, mc[11]");//	round 2: ii=19, jj=11;	multiply 9th dgt of p503p1 w/ 12th dgt of C.
-		__asm("adds v, v, UV[0]");//	add LSB to v, store in v.
-		__asm("adcs u, u, UV[1]");//	add MSB to u, store in u.
-		__asm("adcs t, t, #0x00");//	add carry to t, store in t.	
-
-		temp1 = ((digit_t*)p503p1)[7];
-		__asm("umull UV[0], UV[1], temp1, mc[12]");//	round 2: ii=19, jj=12;	multiply 8th dgt of p503p1 w/ 13th dgt of C.
-		__asm("adds v, v, UV[0]");//	add LSB to v, store in v.
-		__asm("adcs u, u, UV[1]");//	add MSB to u, store in u.
-		__asm("adcs t, t, #0x00");//	add carry to t, store in t.
-		
-		__asm("adds mc[3], v, ma[19]");//	round 2: ii=19, jj=16;	add v to 20th dgt of A, store in 4th dgt of C.
-		__asm("adcs v, u, #0x00");//	add carry to u, store in v.
-		__asm("adcs u, t, #0x00");//	add carry to t, store in u.
-		__asm("mov t, #0x00");//	set t to zero.
-
-
-		temp1 = ((digit_t*)p503p1)[15];
-		__asm("umull UV[0], UV[1], temp1, mc[5]");//	round 2: ii=20, jj=5;	multiply 16th dgt of p503p1 w/ 6th dgt of C.
-		__asm("adds v, v, UV[0]");//	add LSB to v, store in v.
-		__asm("adcs u, u, UV[1]");//	add MSB to u, store in u.
-		__asm("adcs t, t, #0x00");//	add carry to t, store in t.
-		
-		temp1 = ((digit_t*)p503p1)[14];
-		__asm("umull UV[0], UV[1], temp1, mc[6]");//	round 2: ii=20, jj=6;	multiply 15th dgt of p503p1 w/ 7th dgt of C.
-		__asm("adds v, v, UV[0]");//	add LSB to v, store in v.
-		__asm("adcs u, u, UV[1]");//	add MSB to u, store in u.
-		__asm("adcs t, t, #0x00");//	add carry to t, store in t.		
-
-		temp1 = ((digit_t*)p503p1)[13];
-		__asm("umull UV[0], UV[1], temp1, mc[7]");//	round 2: ii=20, jj=7;	multiply 14th dgt of p503p1 w/ 8th dgt of C.
-		__asm("adds v, v, UV[0]");//	add LSB to v, store in v.
-		__asm("adcs u, u, UV[1]");//	add MSB to u, store in u.
-		__asm("adcs t, t, #0x00");//	add carry to t, store in t.		
-
-		temp1 = ((digit_t*)p503p1)[12];
-		__asm("umull UV[0], UV[1], temp1, mc[8]");//	round 2: ii=20, jj=8;	multiply 13th dgt of p503p1 w/ 9th dgt of C.
-		__asm("adds v, v, UV[0]");//	add LSB to v, store in v.
-		__asm("adcs u, u, UV[1]");//	add MSB to u, store in u.
-		__asm("adcs t, t, #0x00");//	add carry to t, store in t.		
-
-		temp1 = ((digit_t*)p503p1)[11];
-		__asm("umull UV[0], UV[1], temp1, mc[9]");//	round 2: ii=20, jj=9;	multiply 12th dgt of p503p1 w/ 10th dgt of C.
-		__asm("adds v, v, UV[0]");//	add LSB to v, store in v.
-		__asm("adcs u, u, UV[1]");//	add MSB to u, store in u.
-		__asm("adcs t, t, #0x00");//	add carry to t, store in t.	
-
-		temp1 = ((digit_t*)p503p1)[10];
-		__asm("umull UV[0], UV[1], temp1, mc[10]");//	round 2: ii=20, jj=10;	multiply 11th dgt of p503p1 w/ 11th dgt of C.
-		__asm("adds v, v, UV[0]");//	add LSB to v, store in v.
-		__asm("adcs u, u, UV[1]");//	add MSB to u, store in u.
-		__asm("adcs t, t, #0x00");//	add carry to t, store in t.
-		
-		temp1 = ((digit_t*)p503p1)[9];		
-		__asm("umull UV[0], UV[1], temp1, mc[11]");//	round 2: ii=20, jj=11;	multiply 10th dgt of p503p1 w/ 12th dgt of C.
-		__asm("adds v, v, UV[0]");//	add LSB to v, store in v.
-		__asm("adcs u, u, UV[1]");//	add MSB to u, store in u.
-		__asm("adcs t, t, #0x00");//	add carry to t, store in t.
-
-		temp1 = ((digit_t*)p503p1)[8];
-		__asm("umull UV[0], UV[1], temp1, mc[12]");//	round 2: ii=20, jj=12;	multiply 9th dgt of p503p1 w/ 13th dgt of C.
-		__asm("adds v, v, UV[0]");//	add LSB to v, store in v.
-		__asm("adcs u, u, UV[1]");//	add MSB to u, store in u.
-		__asm("adcs t, t, #0x00");//	add carry to t, store in t.		
-	
-		temp1 = ((digit_t*)p503p1)[7];	
-		__asm("umull UV[0], UV[1], temp1, mc[13]");//	round 2: ii=20, jj=13;	multiply 8th dgt of p503p1 w/ 14th dgt of C.
-		__asm("adds v, v, UV[0]");//	add LSB to v, store in v.
-		__asm("adcs u, u, UV[1]");//	add MSB to u, store in u.
-		__asm("adcs t, t, #0x00");//	add carry to t, store in t.	
-
-		__asm("adds mc[4], v, ma[20]");//	round 2: ii=20, jj=16;	add v to 21st dgt of A, store in 5th dgt of C.
-		__asm("adcs v, u, #0x00");//	add carry to u, store in v.
-		__asm("adcs u, t, #0x00");//	add carry to t, store in u.
-		__asm("mov t, #0x00");//	set t to zero.
-		
-
-		temp1 = ((digit_t*)p503p1)[15];
-		__asm("umull UV[0], UV[1], temp1, mc[6]");//	round 2: ii=21, jj=6;	multiply 16th dgt of p503p1 w/ 7th dgt of C.
-		__asm("adds v, v, UV[0]");//	add LSB to v, store in v.
-		__asm("adcs u, u, UV[1]");//	add MSB to u, store in u.
-		__asm("adcs t, t, #0x00");//	add carry to t, store in t.	
-
-		temp1 = ((digit_t*)p503p1)[14];
-		__asm("umull UV[0], UV[1], temp1, mc[7]");//	round 2: ii=21, jj=7;	multiply 15th dgt of p503p1 w/ 8th dgt of C.
-		__asm("adds v, v, UV[0]");//	add LSB to v, store in v.
-		__asm("adcs u, u, UV[1]");//	add MSB to u, store in u.
-		__asm("adcs t, t, #0x00");//	add carry to t, store in t.
-
-		temp1 = ((digit_t*)p503p1)[13];
-		__asm("umull UV[0], UV[1], temp1, mc[8]");//	round 2: ii=21, jj=8;	multiply 14th dgt of p503p1 w/ 9th dgt of C.
-		__asm("adds v, v, UV[0]");//	add LSB to v, store in v.
-		__asm("adcs u, u, UV[1]");//	add MSB to u, store in u.
-		__asm("adcs t, t, #0x00");//	add carry to t, store in t.
-
-		temp1 = ((digit_t*)p503p1)[12];
-		__asm("umull UV[0], UV[1], temp1, mc[9]");//	round 2: ii=21, jj=9;	multiply 13th dgt of p503p1 w/ 10th dgt of C.
-		__asm("adds v, v, UV[0]");//	add LSB to v, store in v.
-		__asm("adcs u, u, UV[1]");//	add MSB to u, store in u.
-		__asm("adcs t, t, #0x00");//	add carry to t, store in t.		
-
-		temp1 = ((digit_t*)p503p1)[11];
-		__asm("umull UV[0], UV[1], temp1, mc[10]");//	round 2: ii=21, jj=10;	multiply 12th dgt of p503p1 w/ 11th dgt of C.
-		__asm("adds v, v, UV[0]");//	add LSB to v, store in v.
-		__asm("adcs u, u, UV[1]");//	add MSB to u, store in u.
-		__asm("adcs t, t, #0x00");//	add carry to t, store in t.		
-
-		temp1 = ((digit_t*)p503p1)[10];
-		__asm("umull UV[0], UV[1], temp1, mc[11]");//	round 2: ii=21, jj=11;	multiply 11th dgt of p503p1 w/ 12th dgt of C.
-		__asm("adds v, v, UV[0]");//	add LSB to v, store in v.
-		__asm("adcs u, u, UV[1]");//	add MSB to u, store in u.
-		__asm("adcs t, t, #0x00");//	add carry to t, store in t.
-
-		temp1 = ((digit_t*)p503p1)[9];
-		__asm("umull UV[0], UV[1], temp1, mc[12]");//	round 2: ii=21, jj=12;	multiply 10th dgt of p503p1 w/ 13th dgt of C.
-		__asm("adds v, v, UV[0]");//	add LSB to v, store in v.
-		__asm("adcs u, u, UV[1]");//	add MSB to u, store in u.
-		__asm("adcs t, t, #0x00");//	add carry to t, store in t.
-		
-		temp1 = ((digit_t*)p503p1)[8];		
-		__asm("umull UV[0], UV[1], temp1, mc[13]");//	round 2: ii=21, jj=13;	multiply 9th dgt of p503p1 w/ 14th dgt of C.
-		__asm("adds v, v, UV[0]");//	add LSB to v, store in v.
-		__asm("adcs u, u, UV[1]");//	add MSB to u, store in u.
-		__asm("adcs t, t, #0x00");//	add carry to t, store in t.
-
-		temp1 = ((digit_t*)p503p1)[7];
-		__asm("umull UV[0], UV[1], temp1, mc[14]");//	round 2: ii=21, jj=14;	multiply 8th dgt of p503p1 w/ 15th dgt of C.
-		__asm("adds v, v, UV[0]");//	add LSB to v, store in v.
-		__asm("adcs u, u, UV[1]");//	add MSB to u, store in u.
-		__asm("adcs t, t, #0x00");//	add carry to t, store in t.
-		
-		__asm("adds mc[5], v, ma[21]");//	round 2: ii=21, jj=16;	add v to 22nd dgt of A, store in 6th dgt of C.
-		__asm("adcs v, u, #0x00");//	add carry to u, store in v.
-		__asm("adcs u, t, #0x00");//	add carry to t, store in u.
-		__asm("mov t, #0x00");//	set t to zero.
-		
-
-		temp1 = ((digit_t*)p503p1)[15];
-		__asm("umull UV[0], UV[1], temp1, mc[7]");//	round 2: ii=22, jj=7;	multiply 16th dgt of p503p1 w/ 8th dgt of C.
-		__asm("adds v, v, UV[0]");//	add LSB to v, store in v.
-		__asm("adcs u, u, UV[1]");//	add MSB to u, store in u.
-		__asm("adcs t, t, #0x00");//	add carry to t, store in t.		
-
-		temp1 = ((digit_t*)p503p1)[14];
-		__asm("umull UV[0], UV[1], temp1, mc[8]");//	round 2: ii=22, jj=8;	multiply 15th dgt of p503p1 w/ 9th dgt of C.
-		__asm("adds v, v, UV[0]");//	add LSB to v, store in v.
-		__asm("adcs u, u, UV[1]");//	add MSB to u, store in u.
-		__asm("adcs t, t, #0x00");//	add carry to t, store in t.	
-
-		temp1 = ((digit_t*)p503p1)[13];
-		__asm("umull UV[0], UV[1], temp1, mc[9]");//	round 2: ii=22, jj=9;	multiply 14th dgt of p503p1 w/ 10th dgt of C.
-		__asm("adds v, v, UV[0]");//	add LSB to v, store in v.
-		__asm("adcs u, u, UV[1]");//	add MSB to u, store in u.
-		__asm("adcs t, t, #0x00");//	add carry to t, store in t.	
-
-		temp1 = ((digit_t*)p503p1)[12];
-		__asm("umull UV[0], UV[1], temp1, mc[10]");//	round 2: ii=22, jj=10;	multiply 13th dgt of p503p1 w/ 11th dgt of C.
-		__asm("adds v, v, UV[0]");//	add LSB to v, store in v.
-		__asm("adcs u, u, UV[1]");//	add MSB to u, store in u.
-		__asm("adcs t, t, #0x00");//	add carry to t, store in t.		
-		
-		temp1 = ((digit_t*)p503p1)[11];		
-		__asm("umull UV[0], UV[1], temp1, mc[11]");//	round 2: ii=22, jj=11;	multiply 12th dgt of p503p1 w/ 12th dgt of C.
-		__asm("adds v, v, UV[0]");//	add LSB to v, store in v.
-		__asm("adcs u, u, UV[1]");//	add MSB to u, store in u.
-		__asm("adcs t, t, #0x00");//	add carry to t, store in t.		
-
-		temp1 = ((digit_t*)p503p1)[10];
-		__asm("umull UV[0], UV[1], temp1, mc[12]");//	round 2: ii=22, jj=12;	multiply 11th dgt of p503p1 w/ 13th dgt of C.
-		__asm("adds v, v, UV[0]");//	add LSB to v, store in v.
-		__asm("adcs u, u, UV[1]");//	add MSB to u, store in u.
-		__asm("adcs t, t, #0x00");//	add carry to t, store in t.		
-		
-		temp1 = ((digit_t*)p503p1)[9];		
-		__asm("umull UV[0], UV[1], temp1, mc[13]");//	round 2: ii=22, jj=13;	multiply 10th dgt of p503p1 w/ 14th dgt of C.
-		__asm("adds v, v, UV[0]");//	add LSB to v, store in v.
-		__asm("adcs u, u, UV[1]");//	add MSB to u, store in u.
-		__asm("adcs t, t, #0x00");//	add carry to t, store in t.	
-
-		temp1 = ((digit_t*)p503p1)[8];
-		__asm("umull UV[0], UV[1], temp1, mc[14]");//	round 2: ii=22, jj=14;	multiply 9th dgt of p503p1 w/ 15th dgt of C.
-		__asm("adds v, v, UV[0]");//	add LSB to v, store in v.
-		__asm("adcs u, u, UV[1]");//	add MSB to u, store in u.
-		__asm("adcs t, t, #0x00");//	add carry to t, store in t.	
-
-		temp1 = ((digit_t*)p503p1)[7];
-		__asm("umull UV[0], UV[1], temp1, mc[15]");//	round 2: ii=22, jj=15;	multiply 8th dgt of p503p1 w/ 16th dgt of C.
-		__asm("adds v, v, UV[0]");//	add LSB to v, store in v.
-		__asm("adcs u, u, UV[1]");//	add MSB to u, store in u.
-		__asm("adcs t, t, #0x00");//	add carry to t, store in t.	
-
-		__asm("adds mc[6], v, ma[22]");//	round 2: ii=22, jj=16;	add v to 23rd dgt of A, store in 7th dgt of C.
-		__asm("adcs v, u, #0x00");//	add carry to u, store in v.
-		__asm("adcs u, t, #0x00");//	add carry to t, store in u.
-		__asm("mov t, #0x00");//	set t to zero.
+		__asm("adds t, ma[9], t");
+		__asm("adcs v, #0, v");
+		__asm("adcs u, #0, u");
+		__asm("add mc[9], #0, t");
 		
 		
-		temp1 = ((digit_t*)p503p1)[15];		
-		__asm("umull UV[0], UV[1], temp1, mc[8]");//	round 2: ii=23, jj=8;	multiply 16th dgt of p503p1 w/ 9th dgt of C.
-		__asm("adds v, v, UV[0]");//	add LSB to v, store in v.
-		__asm("adcs u, u, UV[1]");//	add MSB to u, store in u.
-		__asm("adcs t, t, #0x00");//	add carry to t, store in t.
-
-		temp1 = ((digit_t*)p503p1)[14];
-		__asm("umull UV[0], UV[1], temp1, mc[9]");//	round 2: ii=23, jj=9;	multiply 15th dgt of p503p1 w/ 10 dgt of C.
-		__asm("adds v, v, UV[0]");//	add LSB to v, store in v.
-		__asm("adcs u, u, UV[1]");//	add MSB to u, store in u.
-		__asm("adcs t, t, #0x00");//	add carry to t, store in t.	
-
-		temp1 = ((digit_t*)p503p1)[13];
-		__asm("umull UV[0], UV[1], temp1, mc[10]");//	round 2: ii=23, jj=10;	multiply 14th dgt of p503p1 w/ 11th dgt of C.
-		__asm("adds v, v, UV[0]");//	add LSB to v, store in v.
-		__asm("adcs u, u, UV[1]");//	add MSB to u, store in u.
-		__asm("adcs t, t, #0x00");//	add carry to t, store in t.		
-
-		temp1 = ((digit_t*)p503p1)[12];
-		__asm("umull UV[0], UV[1], temp1, mc[11]");//	round 2: ii=23, jj=11;	multiply 13th dgt of p503p1 w/ 12th dgt of C.
-		__asm("adds v, v, UV[0]");//	add LSB to v, store in v.
-		__asm("adcs u, u, UV[1]");//	add MSB to u, store in u.
-		__asm("adcs t, t, #0x00");//	add carry to t, store in t.	
-
-		temp1 = ((digit_t*)p503p1)[11];
-		__asm("umull UV[0], UV[1], temp1, mc[12]");//	round 2: ii=23, jj=12;	multiply 12th dgt of p503p1 w/ 13th dgt of C.
-		__asm("adds v, v, UV[0]");//	add LSB to v, store in v.
-		__asm("adcs u, u, UV[1]");//	add MSB to u, store in u.
-		__asm("adcs t, t, #0x00");//	add carry to t, store in t.			
-
-		temp1 = ((digit_t*)p503p1)[10];
-		__asm("umull UV[0], UV[1], temp1, mc[13]");//	round 2: ii=23, jj=13;	multiply 11th dgt of p503p1 w/ 14th dgt of C.
-		__asm("adds v, v, UV[0]");//	add LSB to v, store in v.
-		__asm("adcs u, u, UV[1]");//	add MSB to u, store in u.
-		__asm("adcs t, t, #0x00");//	add carry to t, store in t.	
-
-		temp1 = ((digit_t*)p503p1)[9];
-		__asm("umull UV[0], UV[1], temp1, mc[14]");//	round 2: ii=23, jj=14;	multiply 10th dgt of p503p1 w/ 15 dgt of C.
-		__asm("adds v, v, UV[0]");//	add LSB to v, store in v.
-		__asm("adcs u, u, UV[1]");//	add MSB to u, store in u.
-		__asm("adcs t, t, #0x00");//	add carry to t, store in t.	
-
-		temp1 = ((digit_t*)p503p1)[8];
-		__asm("umull UV[0], UV[1], temp1, mc[15]");//	round 2: ii=23, jj=15;	multiply 9th dgt of p503p1 w/ 16th dgt of C.
-		__asm("adds v, v, UV[0]");//	add LSB to v, store in v.
-		__asm("adcs u, u, UV[1]");//	add MSB to u, store in u.
-		__asm("adcs t, t, #0x00");//	add carry to t, store in t.
-
-		__asm("adds mc[7], v, ma[23]");//	round 2: ii=23, jj=16;	add v to 24th dgt of A, store in 8th dgt of C.
-		__asm("adcs v, u, #0x00");//	add carry to u, store in v.
-		__asm("adcs u, t, #0x00");//	add carry to t, store in u.
-		__asm("mov t, #0x00");//	set t to zero.
+		//ma[10] iteration
 		
-
-		temp1 = ((digit_t*)p503p1)[15];
-		__asm("umull UV[0], UV[1], temp1, mc[9]");//	round 2: ii=24, jj=9;	multiply 16th dgt of p503p1 w/ 10th dgt of C.
-		__asm("adds v, v, UV[0]");//	add LSB to v, store in v.
-		__asm("adcs u, u, UV[1]");//	add MSB to u, store in u.
-		__asm("adcs t, t, #0x00");//	add carry to t, store in t.		
-
-		temp1 = ((digit_t*)p503p1)[14];
-		__asm("umull UV[0], UV[1], temp1, mc[10]");//	round 2: ii=24, jj=10;	multiply 15th dgt of p503p1 w/ 11th dgt of C.
-		__asm("adds v, v, UV[0]");//	add LSB to v, store in v.
-		__asm("adcs u, u, UV[1]");//	add MSB to u, store in u.
-		__asm("adcs t, t, #0x00");//	add carry to t, store in t.			
-
-		temp1 = ((digit_t*)p503p1)[13];
-		__asm("umull UV[0], UV[1], temp1, mc[11]");//	round 2: ii=24, jj=11;	multiply 14th dgt of p503p1 w/ 12th dgt of C.
-		__asm("adds v, v, UV[0]");//	add LSB to v, store in v.
-		__asm("adcs u, u, UV[1]");//	add MSB to u, store in u.
-		__asm("adcs t, t, #0x00");//	add carry to t, store in t.	
-
-		temp1 = ((digit_t*)p503p1)[12];
-		__asm("umull UV[0], UV[1], temp1, mc[12]");//	round 2: ii=24, jj=12;	multiply 13th dgt of p503p1 w/ 13th dgt of C.
-		__asm("adds v, v, UV[0]");//	add LSB to v, store in v.
-		__asm("adcs u, u, UV[1]");//	add MSB to u, store in u.
-		__asm("adcs t, t, #0x00");//	add carry to t, store in t.	
-
-		temp1 = ((digit_t*)p503p1)[11];
-		__asm("umull UV[0], UV[1], temp1, mc[13]");//	round 2: ii=24, jj=13;	multiply 12th dgt of p503p1 w/ 14th dgt of C.
-		__asm("adds v, v, UV[0]");//	add LSB to v, store in v.
-		__asm("adcs u, u, UV[1]");//	add MSB to u, store in u.
-		__asm("adcs t, t, #0x00");//	add carry to t, store in t.		
-
-		temp1 = ((digit_t*)p503p1)[10];
-		__asm("umull UV[0], UV[1], temp1, mc[14]");//	round 2: ii=24, jj=14;	multiply 11th dgt of p503p1 w/ 15th dgt of C.
-		__asm("adds v, v, UV[0]");//	add LSB to v, store in v.
-		__asm("adcs u, u, UV[1]");//	add MSB to u, store in u.
-		__asm("adcs t, t, #0x00");//	add carry to t, store in t.	
-
-		temp1 = ((digit_t*)p503p1)[9];
-		__asm("umull UV[0], UV[1], temp1, mc[15]");//	round 2: ii=24, jj=15;	multiply 10th dgt of p503p1 w/ 16th dgt of C.
-		__asm("adds v, v, UV[0]");//	add LSB to v, store in v.
-		__asm("adcs u, u, UV[1]");//	add MSB to u, store in u.
-		__asm("adcs t, t, #0x00");//	add carry to t, store in t.
-
-		__asm("adds mc[8], v, ma[24]");//	round 2: ii=24, jj=16;	add v to 25th dgt of A, store in 9th dgt of C.
-		__asm("adcs v, u, #0x00");//	add carry to u, store in v.
-		__asm("adcs u, t, #0x00");//	add carry to t, store in u.
-		__asm("mov t, #0x00");//	set t to zero.
+		__asm("umull UV[0], UV[1], ma[0], ((digit_t*)p503p1)[3]");
+		__asm("adds v, UV[0], v");
+		__asm("adcs u, UV[1], u");
+		__asm("adcs t, #0, #0");
+		
+		__asm("umull UV[0], UV[1], ma[1], ((digit_t*)p503p1)[2]");
+		__asm("adds v, UV[0], v");
+		__asm("adcs u, UV[1], u");
+		__asm("adcs t, #0, t");
+		
+		__asm("umull UV[0], UV[1], ma[2], ((digit_t*)p503p1)[1]");
+		__asm("adds v, UV[0], v");
+		__asm("adcs u, UV[1], u");
+		__asm("adcs t, #0, t");
+		
+		__asm("umull UV[0], UV[1], ma[3], ((digit_t*)p503p1)[0]");
+		__asm("adds v, UV[0], v");
+		__asm("adcs u, UV[1], u");
+		__asm("adcs t, #0, t");
+		
+		__asm("adds v, ma[10], v");
+		__asm("adcs u, #0, u");
+		__asm("adcs t, #0, t");
+		__asm("add mc[10], #0, v");
 		
 		
-		temp1 = ((digit_t*)p503p1)[15];		
-		__asm("umull UV[0], UV[1], temp1, mc[10]");//	round 2: ii=25, jj=10;	multiply 16th dgt of p503p1 w/ 11th dgt of C.
-		__asm("adds v, v, UV[0]");//	add LSB to v, store in v.
-		__asm("adcs u, u, UV[1]");//	add MSB to u, store in u.
-		__asm("adcs t, t, #0x00");//	add carry to t, store in t.		
+		//ma[11] iteration
 		
-		temp1 = ((digit_t*)p503p1)[14];		
-		__asm("umull UV[0], UV[1], temp1, mc[11]");//	round 2: ii=25, jj=11;	multiply 15th dgt of p503p1 w/ 12th dgt of C.
-		__asm("adds v, v, UV[0]");//	add LSB to v, store in v.
-		__asm("adcs u, u, UV[1]");//	add MSB to u, store in u.
-		__asm("adcs t, t, #0x00");//	add carry to t, store in t.		
+		__asm("umull UV[0], UV[1], ma[0], ((digit_t*)p503p1)[4]");
+		__asm("adds u, UV[0], u");
+		__asm("adcs t, UV[1], t");
+		__asm("adcs v, #0, #0");
+		
+		__asm("umull UV[0], UV[1], ma[1], ((digit_t*)p503p1)[3]");
+		__asm("adds u, UV[0], u");
+		__asm("adcs t, UV[1], t");
+		__asm("adcs v, #0, v");
 
-		temp1 = ((digit_t*)p503p1)[13];
-		__asm("umull UV[0], UV[1], temp1, mc[12]");//	round 2: ii=25, jj=12;	multiply 14th dgt of p503p1 w/ 13th dgt of C.
-		__asm("adds v, v, UV[0]");//	add LSB to v, store in v.
-		__asm("adcs u, u, UV[1]");//	add MSB to u, store in u.
-		__asm("adcs t, t, #0x00");//	add carry to t, store in t.	
+		__asm("umull UV[0], UV[1], ma[2], ((digit_t*)p503p1)[2]");
+		__asm("adds u, UV[0], u");
+		__asm("adcs t, UV[1], t");
+		__asm("adcs v, #0, v");
+		
+		__asm("umull UV[0], UV[1], ma[3], ((digit_t*)p503p1)[1]");
+		__asm("adds u, UV[0], u");
+		__asm("adcs t, UV[1], t");
+		__asm("adcs v, #0, v");
 
-		temp1 = ((digit_t*)p503p1)[12];
-		__asm("umull UV[0], UV[1], temp1, mc[13]");//	round 2: ii=25, jj=13;	multiply 13th dgt of p503p1 w/ 14th dgt of C.
-		__asm("adds v, v, UV[0]");//	add LSB to v, store in v.
-		__asm("adcs u, u, UV[1]");//	add MSB to u, store in u.
-		__asm("adcs t, t, #0x00");//	add carry to t, store in t.
+		__asm("umull UV[0], UV[1], ma[4], ((digit_t*)p503p1)[0]");
+		__asm("adds u, UV[0], u");
+		__asm("adcs t, UV[1], t");
+		__asm("adcs v, #0, v");
 		
-		temp1 = ((digit_t*)p503p1)[11];		
-		__asm("umull UV[0], UV[1], temp1, mc[14]");//	round 2: ii=25, jj=14;	multiply 12th dgt of p503p1 w/ 15th dgt of C.
-		__asm("adds v, v, UV[0]");//	add LSB to v, store in v.
-		__asm("adcs u, u, UV[1]");//	add MSB to u, store in u.
-		__asm("adcs t, t, #0x00");//	add carry to t, store in t.	
+		__asm("adds u, ma[11], u");
+		__asm("adcs t, #0, t");
+		__asm("adcs v, #0, v");
+		__asm("add mc[11], #0, u");
+		
+		
+		//ma[12] iteration
+		
+		__asm("umull UV[0], UV[1], ma[0], ((digit_t*)p503p1)[5]");
+		__asm("adds t, UV[0], t");
+		__asm("adcs v, UV[1], v");
+		__asm("adcs u, #0, #0");
+		
+		__asm("umull UV[0], UV[1], ma[1], ((digit_t*)p503p1)[4]");
+		__asm("adds t, UV[0], t");
+		__asm("adcs v, UV[1], v");
+		__asm("adcs u, #0, u");	
 
-		temp1 = ((digit_t*)p503p1)[10];
-		__asm("umull UV[0], UV[1], temp1, mc[15]");//	round 2: ii=25, jj=15;	multiply 11th dgt of p503p1 w/ 16th dgt of C.
-		__asm("adds v, v, UV[0]");//	add LSB to v, store in v.
-		__asm("adcs u, u, UV[1]");//	add MSB to u, store in u.
-		__asm("adcs t, t, #0x00");//	add carry to t, store in t.
-			
-		__asm("adds mc[9], v, ma[25]");//	round 2: ii=25, jj=16;	add v to 26th dgt of A, store in 10th dgt of C.
-		__asm("adcs v, u, #0x00");//	add carry to u, store in v.
-		__asm("adcs u, t, #0x00");//	add carry to t, store in u.
-		__asm("mov t, #0x00");//	set t to zero.		
+		__asm("umull UV[0], UV[1], ma[2], ((digit_t*)p503p1)[3]");
+		__asm("adds t, UV[0], t");
+		__asm("adcs v, UV[1], v");
+		__asm("adcs u, #0, u");	
 		
-		
-		temp1 = ((digit_t*)p503p1)[15];		
-		__asm("umull UV[0], UV[1], temp1, mc[11]");//	round 2: ii=26, jj=11;	multiply 16th dgt of p503p1 w/ 12th dgt of C.
-		__asm("adds v, v, UV[0]");//	add LSB to v, store in v.
-		__asm("adcs u, u, UV[1]");//	add MSB to u, store in u.
-		__asm("adcs t, t, #0x00");//	add carry to t, store in t.	
+		__asm("umull UV[0], UV[1], ma[3], ((digit_t*)p503p1)[2]");
+		__asm("adds t, UV[0], t");
+		__asm("adcs v, UV[1], v");
+		__asm("adcs u, #0, u");	
 
-		temp1 = ((digit_t*)p503p1)[14];
-		__asm("umull UV[0], UV[1], temp1, mc[12]");//	round 2: ii=26, jj=12;	multiply 15th dgt of p503p1 w/ 13th dgt of C.
-		__asm("adds v, v, UV[0]");//	add LSB to v, store in v.
-		__asm("adcs u, u, UV[1]");//	add MSB to u, store in u.
-		__asm("adcs t, t, #0x00");//	add carry to t, store in t.	
+		__asm("umull UV[0], UV[1], ma[4], ((digit_t*)p503p1)[1]");
+		__asm("adds t, UV[0], t");
+		__asm("adcs v, UV[1], v");
+		__asm("adcs u, #0, u");	
+		
+		__asm("umull UV[0], UV[1], ma[5], ((digit_t*)p503p1)[0]");
+		__asm("adds t, UV[0], t");
+		__asm("adcs v, UV[1], v");
+		__asm("adcs u, #0, u");		
 
-		temp1 = ((digit_t*)p503p1)[13];
-		__asm("umull UV[0], UV[1], temp1, mc[13]");//	round 2: ii=26, jj=13;	multiply 14th dgt of p503p1 w/ 14th dgt of C.
-		__asm("adds v, v, UV[0]");//	add LSB to v, store in v.
-		__asm("adcs u, u, UV[1]");//	add MSB to u, store in u.
-		__asm("adcs t, t, #0x00");//	add carry to t, store in t.			
+		__asm("adds t, ma[12], t");
+		__asm("adcs v, #0, v");
+		__asm("adcs u, #0, u");
+		__asm("add mc[12], #0, t");
 		
-		temp1 = ((digit_t*)p503p1)[12];		
-		__asm("umull UV[0], UV[1], temp1, mc[14]");//	round 2: ii=26, jj=14;	multiply 13th dgt of p503p1 w/ 15th dgt of C.
-		__asm("adds v, v, UV[0]");//	add LSB to v, store in v.
-		__asm("adcs u, u, UV[1]");//	add MSB to u, store in u.
-		__asm("adcs t, t, #0x00");//	add carry to t, store in t.			
 		
-		temp1 = ((digit_t*)p503p1)[11];		
-		__asm("umull UV[0], UV[1], temp1, mc[15]");//	round 2: ii=26, jj=15;	multiply 12th dgt of p503p1 w/ 16th dgt of C.
-		__asm("adds v, v, UV[0]");//	add LSB to v, store in v.
-		__asm("adcs u, u, UV[1]");//	add MSB to u, store in u.
-		__asm("adcs t, t, #0x00");//	add carry to t, store in t.		
+		//ma[13] iteration
+		
+		__asm("umull UV[0], UV[1], ma[0], ((digit_t*)p503p1)[6]");
+		__asm("adds v, UV[0], v");
+		__asm("adcs u, UV[1], u");
+		__asm("adcs t, #0, #0");
+		
+		__asm("umull UV[0], UV[1], ma[1], ((digit_t*)p503p1)[5]");
+		__asm("adds v, UV[0], v");
+		__asm("adcs u, UV[1], u");
+		__asm("adcs t, #0, t");
+		
+		__asm("umull UV[0], UV[1], ma[2], ((digit_t*)p503p1)[4]");
+		__asm("adds v, UV[0], v");
+		__asm("adcs u, UV[1], u");
+		__asm("adcs t, #0, t");
+		
+		__asm("umull UV[0], UV[1], ma[3], ((digit_t*)p503p1)[3]");
+		__asm("adds v, UV[0], v");
+		__asm("adcs u, UV[1], u");
+		__asm("adcs t, #0, t");
+		
+		__asm("umull UV[0], UV[1], ma[4], ((digit_t*)p503p1)[2]");
+		__asm("adds v, UV[0], v");
+		__asm("adcs u, UV[1], u");
+		__asm("adcs t, #0, t");
+		
+		__asm("umull UV[0], UV[1], ma[5], ((digit_t*)p503p1)[1]");
+		__asm("adds v, UV[0], v");
+		__asm("adcs u, UV[1], u");
+		__asm("adcs t, #0, t");
+		
+		__asm("umull UV[0], UV[1], ma[6], ((digit_t*)p503p1)[0]");
+		__asm("adds v, UV[0], v");
+		__asm("adcs u, UV[1], u");
+		__asm("adcs t, #0, t");
+		
+		__asm("adds v, ma[13], v");
+		__asm("adcs u, #0, u");
+		__asm("adcs t, #0, t");
+		__asm("add mc[13], #0, v");
+		
+		
+		//ma[14] iteration
+		
+		__asm("umull UV[0], UV[1], ma[0], ((digit_t*)p503p1)[7]");
+		__asm("adds u, UV[0], u");
+		__asm("adcs t, UV[1], t");
+		__asm("adcs v, #0, #0");
+		
+		__asm("umull UV[0], UV[1], ma[1], ((digit_t*)p503p1)[6]");
+		__asm("adds u, UV[0], u");
+		__asm("adcs t, UV[1], t");
+		__asm("adcs v, #0, v");
+		
+		__asm("umull UV[0], UV[1], ma[2], ((digit_t*)p503p1)[5]");
+		__asm("adds u, UV[0], u");
+		__asm("adcs t, UV[1], t");
+		__asm("adcs v, #0, v");
+		
+		__asm("umull UV[0], UV[1], ma[3], ((digit_t*)p503p1)[4]");
+		__asm("adds u, UV[0], u");
+		__asm("adcs t, UV[1], t");
+		__asm("adcs v, #0, v");
+		
+		__asm("umull UV[0], UV[1], ma[4], ((digit_t*)p503p1)[3]");
+		__asm("adds u, UV[0], u");
+		__asm("adcs t, UV[1], t");
+		__asm("adcs v, #0, v");
+		
+		__asm("umull UV[0], UV[1], ma[5], ((digit_t*)p503p1)[2]");
+		__asm("adds u, UV[0], u");
+		__asm("adcs t, UV[1], t");
+		__asm("adcs v, #0, v");
+		
+		__asm("umull UV[0], UV[1], ma[6], ((digit_t*)p503p1)[1]");
+		__asm("adds u, UV[0], u");
+		__asm("adcs t, UV[1], t");
+		__asm("adcs v, #0, v");
+		
+		__asm("umull UV[0], UV[1], mc[7], ((digit_t*)p503p1)[0]");
+		__asm("adds u, UV[0], u");
+		__asm("adcs t, UV[1], t");
+		__asm("adcs v, #0, v");
+		
+		__asm("adds u, ma[14], u");
+		__asm("adcs t, #0, t");
+		__asm("adcs v, #0, v");
+		__asm("add mc[14], #0, u");
+		
+		
+		//ma[15] iteration
+		
+		__asm("umull UV[0], UV[1], ma[0], ((digit_t*)p503p1)[8]");
+		__asm("adds t, UV[0], t");
+		__asm("adcs v, UV[1], v");
+		__asm("adcs u, #0, #0");
+		
+		__asm("umull UV[0], UV[1], ma[1], ((digit_t*)p503p1)[7]");
+		__asm("adds t, UV[0], t");
+		__asm("adcs v, UV[1], v");
+		__asm("adcs u, #0, u");
+		
+		__asm("umull UV[0], UV[1], ma[2], ((digit_t*)p503p1)[6]");
+		__asm("adds t, UV[0], t");
+		__asm("adcs v, UV[1], v");
+		__asm("adcs u, #0, u");
+		
+		__asm("umull UV[0], UV[1], ma[3], ((digit_t*)p503p1)[5]");
+		__asm("adds t, UV[0], t");
+		__asm("adcs v, UV[1], v");
+		__asm("adcs u, #0, u");
+		
+		__asm("umull UV[0], UV[1], ma[4], ((digit_t*)p503p1)[4]");
+		__asm("adds t, UV[0], t");
+		__asm("adcs v, UV[1], v");
+		__asm("adcs u, #0, u");
+		
+		__asm("umull UV[0], UV[1], ma[5], ((digit_t*)p503p1)[3]");
+		__asm("adds t, UV[0], t");
+		__asm("adcs v, UV[1], v");
+		__asm("adcs u, #0, u");
+		
+		__asm("umull UV[0], UV[1], ma[6], ((digit_t*)p503p1)[2]");
+		__asm("adds t, UV[0], t");
+		__asm("adcs v, UV[1], v");
+		__asm("adcs u, #0, u");
+		
+		__asm("umull UV[0], UV[1], mc[7], ((digit_t*)p503p1)[1]");
+		__asm("adds t, UV[0], t");
+		__asm("adcs v, UV[1], v");
+		__asm("adcs u, #0, u");
+		
+		__asm("umull UV[0], UV[1], mc[8], ((digit_t*)p503p1)[0]");
+		__asm("adds t, UV[0], t");
+		__asm("adcs v, UV[1], v");
+		__asm("adcs u, #0, u");
+		
+		__asm("adds t, ma[15], t");
+		__asm("adcs v, #0, v");
+		__asm("adcs u, #0, u");
+		__asm("add mc[15], #0, t");
+		
+		
+		//ma[16] iteration
+		
+		
+		__asm("umull UV[0], UV[1], ma[1], ((digit_t*)p503p1)[8]");
+		__asm("adds v, UV[0], v");
+		__asm("adcs u, UV[1], u");
+		__asm("adcs t, #0, 0");
+		
+		__asm("umull UV[0], UV[1], ma[2], ((digit_t*)p503p1)[7]");
+		__asm("adds v, UV[0], v");
+		__asm("adcs u, UV[1], u");
+		__asm("adcs t, #0, t");
+		
+		__asm("umull UV[0], UV[1], ma[3], ((digit_t*)p503p1)[6]");
+		__asm("adds v, UV[0], v");
+		__asm("adcs u, UV[1], u");
+		__asm("adcs t, #0, t");
+		
+		__asm("umull UV[0], UV[1], ma[4], ((digit_t*)p503p1)[5]");
+		__asm("adds v, UV[0], v");
+		__asm("adcs u, UV[1], u");
+		__asm("adcs t, #0, t");
+		
+		__asm("umull UV[0], UV[1], ma[5], ((digit_t*)p503p1)[4]");
+		__asm("adds v, UV[0], v");
+		__asm("adcs u, UV[1], u");
+		__asm("adcs t, #0, t");
+		
+		__asm("umull UV[0], UV[1], ma[6], ((digit_t*)p503p1)[3]");
+		__asm("adds v, UV[0], v");
+		__asm("adcs u, UV[1], u");
+		__asm("adcs t, #0, t");
+		
+		__asm("umull UV[0], UV[1], mc[7], ((digit_t*)p503p1)[2]");
+		__asm("adds v, UV[0], v");
+		__asm("adcs u, UV[1], u");
+		__asm("adcs t, #0, t");
+		
+		__asm("umull UV[0], UV[1], mc[8], ((digit_t*)p503p1)[1]");
+		__asm("adds v, UV[0], v");
+		__asm("adcs u, UV[1], u");
+		__asm("adcs t, #0, t");
+		
+		__asm("umull UV[0], UV[1], mc[9], ((digit_t*)p503p1)[0]");
+		__asm("adds v, UV[0], v");
+		__asm("adcs u, UV[1], u");
+		__asm("adcs t, #0, t");
+		
+		__asm("adds v, ma[16], v");
+		__asm("adcs u, #0, u");
+		__asm("adcs t, #0, t");
+		__asm("add mc[0], #0, v");
+		
+		
+		//ma[17] iteration
+		
+		__asm("umull UV[0], UV[1], ma[2], ((digit_t*)p503p1)[8]");
+		__asm("adds u, UV[0], u");
+		__asm("adcs t, UV[1], t");
+		__asm("adcs v, #0, #0");
+		
+		__asm("umull UV[0], UV[1], ma[3], ((digit_t*)p503p1)[7]");
+		__asm("adds u, UV[0], u");
+		__asm("adcs t, UV[1], t");
+		__asm("adcs v, #0, v");
+		
+		__asm("umull UV[0], UV[1], ma[4], ((digit_t*)p503p1)[6]");
+		__asm("adds u, UV[0], u");
+		__asm("adcs t, UV[1], t");
+		__asm("adcs v, #0, v");
+		
+		__asm("umull UV[0], UV[1], ma[5], ((digit_t*)p503p1)[5]");
+		__asm("adds u, UV[0], u");
+		__asm("adcs t, UV[1], t");
+		__asm("adcs v, #0, v");
+		
+		__asm("umull UV[0], UV[1], ma[6], ((digit_t*)p503p1)[4]");
+		__asm("adds u, UV[0], u");
+		__asm("adcs t, UV[1], t");
+		__asm("adcs v, #0, v");
+		
+		__asm("umull UV[0], UV[1], mc[7], ((digit_t*)p503p1)[3]");
+		__asm("adds u, UV[0], u");
+		__asm("adcs t, UV[1], t");
+		__asm("adcs v, #0, v");
+		
+		__asm("umull UV[0], UV[1], mc[8], ((digit_t*)p503p1)[2]");
+		__asm("adds u, UV[0], u");
+		__asm("adcs t, UV[1], t");
+		__asm("adcs v, #0, v");
+		
+		__asm("umull UV[0], UV[1], mc[9], ((digit_t*)p503p1)[1]");
+		__asm("adds u, UV[0], u");
+		__asm("adcs t, UV[1], t");
+		__asm("adcs v, #0, v");
+		
+		__asm("umull UV[0], UV[1], mc[10], ((digit_t*)p503p1)[0]");
+		__asm("adds u, UV[0], u");
+		__asm("adcs t, UV[1], t");
+		__asm("adcs v, #0, v");
+		
+		__asm("adds u, ma[17], u");
+		__asm("adcs t, #0, t");
+		__asm("adcs v, #0, v");
+		__asm("add mc[1], #0, u");
+		
+		
+		//ma[18] iteration
+		
+		__asm("umull UV[0], UV[1], ma[3], ((digit_t*)p503p1)[8]");
+		__asm("adds t, UV[0], t");
+		__asm("adcs v, UV[1], v");
+		__asm("adcs u, #0, #0");
+		
+		__asm("umull UV[0], UV[1], ma[4], ((digit_t*)p503p1)[7]");
+		__asm("adds t, UV[0], t");
+		__asm("adcs v, UV[1], v");
+		__asm("adcs u, #0, u");
+		
+		__asm("umull UV[0], UV[1], ma[5], ((digit_t*)p503p1)[6]");
+		__asm("adds t, UV[0], t");
+		__asm("adcs v, UV[1], v");
+		__asm("adcs u, #0, u");
+		
+		__asm("umull UV[0], UV[1], ma[6], ((digit_t*)p503p1)[5]");
+		__asm("adds t, UV[0], t");
+		__asm("adcs v, UV[1], v");
+		__asm("adcs u, #0, u");
+		
+		__asm("umull UV[0], UV[1], mc[7], ((digit_t*)p503p1)[4]");
+		__asm("adds t, UV[0], t");
+		__asm("adcs v, UV[1], v");
+		__asm("adcs u, #0, u");
+		
+		__asm("umull UV[0], UV[1], mc[8], ((digit_t*)p503p1)[3]");
+		__asm("adds t, UV[0], t");
+		__asm("adcs v, UV[1], v");
+		__asm("adcs u, #0, u");
+		
+		__asm("umull UV[0], UV[1], mc[9], ((digit_t*)p503p1)[2]");
+		__asm("adds t, UV[0], t");
+		__asm("adcs v, UV[1], v");
+		__asm("adcs u, #0, u");
+		
+		__asm("umull UV[0], UV[1], mc[10], ((digit_t*)p503p1)[1]");
+		__asm("adds t, UV[0], t");
+		__asm("adcs v, UV[1], v");
+		__asm("adcs u, #0, u");
+		
+		__asm("umull UV[0], UV[1], mc[11], ((digit_t*)p503p1)[0]");
+		__asm("adds t, UV[0], t");
+		__asm("adcs v, UV[1], v");
+		__asm("adcs u, #0, u");
+		
+		__asm("adds t, ma[18], t");
+		__asm("adcs v, #0, v");
+		__asm("adcs u, #0, u");
+		__asm("add mc[2], #0, t");
+		
+		
+		//ma[19] iteration
+		
+		__asm("umull UV[0], UV[1], ma[4], ((digit_t*)p503p1)[8]");
+		__asm("adds v, UV[0], v");
+		__asm("adcs u, UV[1], u");
+		__asm("adcs t, #0, #0");
+		
+		__asm("umull UV[0], UV[1], ma[5], ((digit_t*)p503p1)[7]");
+		__asm("adds v, UV[0], v");
+		__asm("adcs u, UV[1], u");
+		__asm("adcs t, #0, t");
+		
+		__asm("umull UV[0], UV[1], ma[6], ((digit_t*)p503p1)[6]");
+		__asm("adds v, UV[0], v");
+		__asm("adcs u, UV[1], u");
+		__asm("adcs t, #0, t");
+		
+		__asm("umull UV[0], UV[1], mc[7], ((digit_t*)p503p1)[5]");
+		__asm("adds v, UV[0], v");
+		__asm("adcs u, UV[1], u");
+		__asm("adcs t, #0, t");
+		
+		__asm("umull UV[0], UV[1], mc[8], ((digit_t*)p503p1)[4]");
+		__asm("adds v, UV[0], v");
+		__asm("adcs u, UV[1], u");
+		__asm("adcs t, #0, t");
+		
+		__asm("umull UV[0], UV[1], mc[9], ((digit_t*)p503p1)[3]");
+		__asm("adds v, UV[0], v");
+		__asm("adcs u, UV[1], u");
+		__asm("adcs t, #0, t");
+		
+		__asm("umull UV[0], UV[1], mc[10], ((digit_t*)p503p1)[2]");
+		__asm("adds v, UV[0], v");
+		__asm("adcs u, UV[1], u");
+		__asm("adcs t, #0, t");
+		
+		__asm("umull UV[0], UV[1], mc[11], ((digit_t*)p503p1)[1]");
+		__asm("adds v, UV[0], v");
+		__asm("adcs u, UV[1], u");
+		__asm("adcs t, #0, t");
+		
+		__asm("umull UV[0], UV[1], mc[12], ((digit_t*)p503p1)[0]");
+		__asm("adds v, UV[0], v");
+		__asm("adcs u, UV[1], u");
+		__asm("adcs t, #0, t");
+		
+		__asm("adds v, ma[19], v");
+		__asm("adcs u, #0, u");
+		__asm("adcs t, #0, t");
+		__asm("add mc[3], #0, v");
+		
+		
+		//ma[20] iteration
+		
+		__asm("umull UV[0], UV[1], ma[5], ((digit_t*)p503p1)[8]");
+		__asm("adds u, UV[0], u");
+		__asm("adcs t, UV[1], t");
+		__asm("adcs v, #0, #0");
+		
+		__asm("umull UV[0], UV[1], ma[6], ((digit_t*)p503p1)[7]");
+		__asm("adds u, UV[0], u");
+		__asm("adcs t, UV[1], t");
+		__asm("adcs v, #0, v");
+		
+		__asm("umull UV[0], UV[1], mc[7], ((digit_t*)p503p1)[6]");
+		__asm("adds u, UV[0], u");
+		__asm("adcs t, UV[1], t");
+		__asm("adcs v, #0, v");
+		
+		__asm("umull UV[0], UV[1], mc[8], ((digit_t*)p503p1)[5]");
+		__asm("adds u, UV[0], u");
+		__asm("adcs t, UV[1], t");
+		__asm("adcs v, #0, v");
+		
+		__asm("umull UV[0], UV[1], mc[9], ((digit_t*)p503p1)[4]");
+		__asm("adds u, UV[0], u");
+		__asm("adcs t, UV[1], t");
+		__asm("adcs v, #0, v");
+		
+		__asm("umull UV[0], UV[1], mc[10], ((digit_t*)p503p1)[3]");
+		__asm("adds u, UV[0], u");
+		__asm("adcs t, UV[1], t");
+		__asm("adcs v, #0, v");
+		
+		__asm("umull UV[0], UV[1], mc[11], ((digit_t*)p503p1)[2]");
+		__asm("adds u, UV[0], u");
+		__asm("adcs t, UV[1], t");
+		__asm("adcs v, #0, v");
+		
+		__asm("umull UV[0], UV[1], mc[12], ((digit_t*)p503p1)[1]");
+		__asm("adds u, UV[0], u");
+		__asm("adcs t, UV[1], t");
+		__asm("adcs v, #0, v");
+		
+		__asm("umull UV[0], UV[1], mc[13], ((digit_t*)p503p1)[0]");
+		__asm("adds u, UV[0], u");
+		__asm("adcs t, UV[1], t");
+		__asm("adcs v, #0, v");
+		
+		__asm("adds u, ma[20], u");
+		__asm("adcs t, #0, t");
+		__asm("adcs v, #0, v");
+		__asm("add mc[4], #0, u");
+		
+		
+		//ma[21] iteration
+		
+		__asm("umull UV[0], UV[1], ma[6], ((digit_t*)p503p1)[8]");
+		__asm("adds t, UV[0], t");
+		__asm("adcs v, UV[1], v");
+		__asm("adcs u, #0, #0");
+		
+		__asm("umull UV[0], UV[1], mc[7], ((digit_t*)p503p1)[7]");
+		__asm("adds t, UV[0], t");
+		__asm("adcs v, UV[1], v");
+		__asm("adcs u, #0, u");
+		
+		__asm("umull UV[0], UV[1], mc[8], ((digit_t*)p503p1)[6]");
+		__asm("adds t, UV[0], t");
+		__asm("adcs v, UV[1], v");
+		__asm("adcs u, #0, u");
+		
+		__asm("umull UV[0], UV[1], mc[9], ((digit_t*)p503p1)[5]");
+		__asm("adds t, UV[0], t");
+		__asm("adcs v, UV[1], v");
+		__asm("adcs u, #0, u");
+		
+		__asm("umull UV[0], UV[1], mc[10], ((digit_t*)p503p1)[4]");
+		__asm("adds t, UV[0], t");
+		__asm("adcs v, UV[1], v");
+		__asm("adcs u, #0, u");
+		
+		__asm("umull UV[0], UV[1], mc[11], ((digit_t*)p503p1)[3]");
+		__asm("adds t, UV[0], t");
+		__asm("adcs v, UV[1], v");
+		__asm("adcs u, #0, u");
+		
+		__asm("umull UV[0], UV[1], mc[12], ((digit_t*)p503p1)[2]");
+		__asm("adds t, UV[0], t");
+		__asm("adcs v, UV[1], v");
+		__asm("adcs u, #0, u");
+		
+		__asm("umull UV[0], UV[1], mc[13], ((digit_t*)p503p1)[1]");
+		__asm("adds t, UV[0], t");
+		__asm("adcs v, UV[1], v");
+		__asm("adcs u, #0, u");
+		
+		__asm("umull UV[0], UV[1], mc[14], ((digit_t*)p503p1)[0]");
+		__asm("adds t, UV[0], t");
+		__asm("adcs v, UV[1], v");
+		__asm("adcs u, #0, u");
+		
+		__asm("adds t, ma[21], t");
+		__asm("adcs v, #0, v");
+		__asm("adcs u, #0, u");
+		__asm("add mc[5], #0, t");
+		
+		
+		//ma[22] iteration
+		
+		__asm("umull UV[0], UV[1], mc[7], ((digit_t*)p503p1)[8]");
+		__asm("adds v, UV[0], v");
+		__asm("adcs u, UV[1], v");
+		__asm("adcs t, #0, #0");
+		
+		__asm("umull UV[0], UV[1], mc[8], ((digit_t*)p503p1)[7]");
+		__asm("adds v, UV[0], v");
+		__asm("adcs u, UV[1], u");
+		__asm("adcs t, #0, t");
+		
+		__asm("umull UV[0], UV[1], mc[9], ((digit_t*)p503p1)[6]");
+		__asm("adds v, UV[0], v");
+		__asm("adcs u, UV[1], u");
+		__asm("adcs t, #0, t");
+		
+		__asm("umull UV[0], UV[1], mc[10], ((digit_t*)p503p1)[5]");
+		__asm("adds v, UV[0], v");
+		__asm("adcs u, UV[1], u");
+		__asm("adcs t, #0, t");
+		
+		__asm("umull UV[0], UV[1], mc[11], ((digit_t*)p503p1)[4]");
+		__asm("adds v, UV[0], v");
+		__asm("adcs u, UV[1], u");
+		__asm("adcs t, #0, t");
+		
+		__asm("umull UV[0], UV[1], mc[12], ((digit_t*)p503p1)[3]");
+		__asm("adds v, UV[0], v");
+		__asm("adcs u, UV[1], u");
+		__asm("adcs t, #0, t");
+		
+		__asm("umull UV[0], UV[1], mc[13], ((digit_t*)p503p1)[2]");
+		__asm("adds v, UV[0], v");
+		__asm("adcs u, UV[1], u");
+		__asm("adcs t, #0, t");
+		
+		__asm("umull UV[0], UV[1], mc[14], ((digit_t*)p503p1)[1]");
+		__asm("adds v, UV[0], v");
+		__asm("adcs u, UV[1], u");
+		__asm("adcs t, #0, t");
+		
+		__asm("umull UV[0], UV[1], mc[15], ((digit_t*)p503p1)[0]");
+		__asm("adds v, UV[0], v");
+		__asm("adcs u, UV[1], u");
+		__asm("adcs t, #0, t");
+		
+		__asm("adds v, ma[22], v");
+		__asm("adcs u, #0, u");
+		__asm("adcs t, #0, t");
+		__asm("add mc[6], #0, v");
+		
+		//ma[23] iteration
+		
+		__asm("umull UV[0], UV[1], mc[8], ((digit_t*)p503p1)[8]");
+		__asm("adds u, UV[0], u");
+		__asm("adcs t, UV[1], t");
+		__asm("adcs v, #0, #0");
+		
+		__asm("umull UV[0], UV[1], mc[9], ((digit_t*)p503p1)[7]");
+		__asm("adds u, UV[0], u");
+		__asm("adcs t, UV[1], t");
+		__asm("adcs v, #0, v");
+		
+		__asm("umull UV[0], UV[1], mc[10], ((digit_t*)p503p1)[6]");
+		__asm("adds u, UV[0], u");
+		__asm("adcs t, UV[1], t");
+		__asm("adcs v, #0, v");
+		
+		__asm("umull UV[0], UV[1], mc[11], ((digit_t*)p503p1)[5]");
+		__asm("adds u, UV[0], u");
+		__asm("adcs t, UV[1], t");
+		__asm("adcs v, #0, v");
+		
+		__asm("umull UV[0], UV[1], mc[12], ((digit_t*)p503p1)[4]");
+		__asm("adds u, UV[0], u");
+		__asm("adcs t, UV[1], t");
+		__asm("adcs v, #0, v");
+		
+		__asm("umull UV[0], UV[1], mc[13], ((digit_t*)p503p1)[3]");
+		__asm("adds u, UV[0], u");
+		__asm("adcs t, UV[1], t");
+		__asm("adcs v, #0, v");
+		
+		__asm("umull UV[0], UV[1], mc[14], ((digit_t*)p503p1)[2]");
+		__asm("adds u, UV[0], u");
+		__asm("adcs t, UV[1], t");
+		__asm("adcs v, #0, v");
+		
+		__asm("umull UV[0], UV[1], mc[15], ((digit_t*)p503p1)[1]");
+		__asm("adds u, UV[0], u");
+		__asm("adcs t, UV[1], t");
+		__asm("adcs v, #0, v");
+		
+		__asm("adds u, ma[23], u");
+		__asm("adcs t, #0, t");
+		__asm("adcs v, #0, v");
+		__asm("add mc[7], #0, u");
+		
+		
+		//ma[24] iteration
+		
+		
+		__asm("umull UV[0], UV[1], mc[9], ((digit_t*)p503p1)[8]");
+		__asm("adds t, UV[0], t");
+		__asm("adcs v, UV[1], v");
+		__asm("adcs u, #0, #0");
+		
+		__asm("umull UV[0], UV[1], mc[10], ((digit_t*)p503p1)[7]");
+		__asm("adds t, UV[0], t");
+		__asm("adcs v, UV[1], v");
+		__asm("adcs u, #0, u");
+		
+		__asm("umull UV[0], UV[1], mc[11], ((digit_t*)p503p1)[6]");
+		__asm("adds t, UV[0], t");
+		__asm("adcs v, UV[1], v");
+		__asm("adcs u, #0, u");
+		
+		__asm("umull UV[0], UV[1], mc[12], ((digit_t*)p503p1)[5]");
+		__asm("adds t, UV[0], t");
+		__asm("adcs v, UV[1], v");
+		__asm("adcs u, #0, u");
+		
+		__asm("umull UV[0], UV[1], mc[13], ((digit_t*)p503p1)[4]");
+		__asm("adds t, UV[0], t");
+		__asm("adcs v, UV[1], v");
+		__asm("adcs u, #0, u");
+		
+		__asm("umull UV[0], UV[1], mc[14], ((digit_t*)p503p1)[3]");
+		__asm("adds t, UV[0], t");
+		__asm("adcs v, UV[1], v");
+		__asm("adcs u, #0, u");
+		
+		__asm("umull UV[0], UV[1], mc[15], ((digit_t*)p503p1)[2]");
+		__asm("adds t, UV[0], t");
+		__asm("adcs v, UV[1], v");
+		__asm("adcs u, #0, u");
+		
+		__asm("adds t, ma[24], t");
+		__asm("adcs v, #0, v");
+		__asm("adcs u, #0, u");
+		__asm("add mc[8], #0, t");
+		
+		
+		//ma[25] iteration
+		
+		__asm("umull UV[0], UV[1], mc[10], ((digit_t*)p503p1)[8]");
+		__asm("adds v, UV[0], v");
+		__asm("adcs u, UV[1], u");
+		__asm("adcs t, #0, #0");
+		
+		__asm("umull UV[0], UV[1], mc[11], ((digit_t*)p503p1)[7]");
+		__asm("adds v, UV[0], v");
+		__asm("adcs u, UV[1], u");
+		__asm("adcs t, #0, t");
+		
+		__asm("umull UV[0], UV[1], mc[12], ((digit_t*)p503p1)[6]");
+		__asm("adds v, UV[0], v");
+		__asm("adcs u, UV[1], u");
+		__asm("adcs t, #0, t");
+		
+		__asm("umull UV[0], UV[1], mc[13], ((digit_t*)p503p1)[5]");
+		__asm("adds v, UV[0], v");
+		__asm("adcs u, UV[1], u");
+		__asm("adcs t, #0, t");
+		
+		__asm("umull UV[0], UV[1], mc[14], ((digit_t*)p503p1)[4]");
+		__asm("adds v, UV[0], v");
+		__asm("adcs u, UV[1], u");
+		__asm("adcs t, #0, t");
+		
+		__asm("umull UV[0], UV[1], mc[15], ((digit_t*)p503p1)[3]");
+		__asm("adds v, UV[0], v");
+		__asm("adcs u, UV[1], u");
+		__asm("adcs t, #0, t");
+		
+		__asm("adds v, ma[25], v");
+		__asm("adcs u, #0, u");
+		__asm("adcs t, #0, t");
+		__asm("add mc[9], #0, v");
+		
+		
+		//ma[26] iteration
+		
+		__asm("umull UV[0], UV[1], mc[11], ((digit_t*)p503p1)[8]");
+		__asm("adds u, UV[0], u");
+		__asm("adcs t, UV[1], t");
+		__asm("adcs v, #0, #0");
+		
+		__asm("umull UV[0], UV[1], mc[12], ((digit_t*)p503p1)[7]");
+		__asm("adds u, UV[0], u");
+		__asm("adcs t, UV[1], t");
+		__asm("adcs v, #0, v");
+		
+		__asm("umull UV[0], UV[1], mc[13], ((digit_t*)p503p1)[6]");
+		__asm("adds u, UV[0], u");
+		__asm("adcs t, UV[1], t");
+		__asm("adcs v, #0, v");
+		
+		__asm("umull UV[0], UV[1], mc[14], ((digit_t*)p503p1)[5]");
+		__asm("adds u, UV[0], u");
+		__asm("adcs t, UV[1], t");
+		__asm("adcs v, #0, v");
+		
+		__asm("umull UV[0], UV[1], mc[15], ((digit_t*)p503p1)[4]");
+		__asm("adds u, UV[0], u");
+		__asm("adcs t, UV[1], t");
+		__asm("adcs v, #0, v");
+		
+		__asm("adds u, ma[26], u");
+		__asm("adcs t, #0, t");
+		__asm("adcs v, #0, v");
+		__asm("add mc[10], #0, u");
+		
+		
+		//ma[27] iteration
+		
+		__asm("umull UV[0], UV[1], mc[12], ((digit_t*)p503p1)[8]");
+		__asm("adds t, UV[0], t");
+		__asm("adcs v, UV[1], v");
+		__asm("adcs u, #0, #0");
+		
+		__asm("umull UV[0], UV[1], mc[13], ((digit_t*)p503p1)[7]");
+		__asm("adds t, UV[0], t");
+		__asm("adcs v, UV[1], v");
+		__asm("adcs u, #0, u");
+		
+		__asm("umull UV[0], UV[1], mc[14], ((digit_t*)p503p1)[6]");
+		__asm("adds t, UV[0], t");
+		__asm("adcs v, UV[1], v");
+		__asm("adcs u, #0, u");
+		
+		__asm("umull UV[0], UV[1], mc[15], ((digit_t*)p503p1)[5]");
+		__asm("adds t, UV[0], t");
+		__asm("adcs v, UV[1], v");
+		__asm("adcs u, #0, u");
+		
+		__asm("adds t, ma[27], t");
+		__asm("adcs v, #0, v");
+		__asm("adcs u, #0, u");
+		__asm("add mc[11], #0, t");
+		
+		
+		//ma[28] iteration
+		
+		__asm("umull UV[0], UV[1], mc[13], ((digit_t*)p503p1)[8]");
+		__asm("adds v, UV[0], v");
+		__asm("adcs u, UV[1], u");
+		__asm("adcs t, #0, #0");
+		
+		__asm("umull UV[0], UV[1], mc[14], ((digit_t*)p503p1)[7]");
+		__asm("adds v, UV[0], v");
+		__asm("adcs u, UV[1], u");
+		__asm("adcs t, #0, t");
+		
+		__asm("umull UV[0], UV[1], mc[15], ((digit_t*)p503p1)[6]");
+		__asm("adds v, UV[0], v");
+		__asm("adcs u, UV[1], u");
+		__asm("adcs t, #0, t");
+		
+		__asm("adds v, ma[28], v");
+		__asm("adcs u, #0, u");
+		__asm("adcs t, #0, t");
+		__asm("add mc[12], #0, v");
+		
+		
+		//ma[29] iteration
+		
+		__asm("umull UV[0], UV[1], mc[14], ((digit_t*)p503p1)[8]");
+		__asm("adds u, UV[0], u");
+		__asm("adcs t, UV[1], t");
+		__asm("adcs v, #0, #0");
+		
+		__asm("umull UV[0], UV[1], mc[15], ((digit_t*)p503p1)[7]");
+		__asm("adds u, UV[0], u");
+		__asm("adcs t, UV[1], t");
+		__asm("adcs v, #0, v");
+		
+		__asm("adds u, ma[29], u");
+		__asm("adcs t, #0, t");
+		__asm("adcs v, #0, #0");
+		__asm("add mc[13], #0, u");
+		
+		
+		//ma[30] iteration
+		
+		__asm("umull UV[0], UV[1], mc[15], ((digit_t*)p503p1)[8]");
+		__asm("adds t, UV[0], t");
+		__asm("adcs v, UV[1], v");
+		__asm("adds t, ma[30], t");
+		
+		__asm("adcs v, ma[31], v");
+		__asm("add mc[14], #0, t");
+		__asm("add mc[15], #0, v");
 
-		__asm("adds mc[10], v, ma[26]");//	round 2: ii=26, jj=16;	add v to 27th dgt of A, store in 11th dgt of C.
-		__asm("adcs v, u, #0x00");//	add carry to u, store in v.
-		__asm("adcs u, t, #0x00");//	add carry to t, store in u.
-		__asm("mov t, #0x00");//	set t to zero.
-		
-
-		temp1 = ((digit_t*)p503p1)[15];
-		__asm("umull UV[0], UV[1], temp1, mc[12]");//	round 2: ii=27, jj=12;	multiply 16th dgt of p503p1 w/ 13th dgt of C.
-		__asm("adds v, v, UV[0]");//	add LSB to v, store in v.
-		__asm("adcs u, u, UV[1]");//	add MSB to u, store in u.
-		__asm("adcs t, t, #0x00");//	add carry to t, store in t.	
-
-		temp1 = ((digit_t*)p503p1)[14];
-		__asm("umull UV[0], UV[1], temp1, mc[13]");//	round 2: ii=27, jj=13;	multiply 15th dgt of p503p1 w/ 14th dgt of C.
-		__asm("adds v, v, UV[0]");//	add LSB to v, store in v.
-		__asm("adcs u, u, UV[1]");//	add MSB to u, store in u.
-		__asm("adcs t, t, #0x00");//	add carry to t, store in t.	
-
-		temp1 = ((digit_t*)p503p1)[13];
-		__asm("umull UV[0], UV[1], temp1, mc[14]");//	round 2: ii=27, jj=14;	multiply 14th dgt of p503p1 w/ 15th dgt of C.
-		__asm("adds v, v, UV[0]");//	add LSB to v, store in v.
-		__asm("adcs u, u, UV[1]");//	add MSB to u, store in u.
-		__asm("adcs t, t, #0x00");//	add carry to t, store in t.	
-		
-		temp1 = ((digit_t*)p503p1)[12];		
-		__asm("umull UV[0], UV[1], temp1, mc[15]");//	round 2: ii=27, jj=15;	multiply 13th dgt of p503p1 w/ 16th dgt of C.
-		__asm("adds v, v, UV[0]");//	add LSB to v, store in v.
-		__asm("adcs u, u, UV[1]");//	add MSB to u, store in u.
-		__asm("adcs t, t, #0x00");//	add carry to t, store in t.		
-
-		__asm("adds mc[11], v, ma[27]");//	round 2: ii=27, jj=16;	add v to 28th dgt of A, store in 12th dgt of C.
-		__asm("adcs v, u, #0x00");//	add carry to u, store in v.
-		__asm("adcs u, t, #0x00");//	add carry to t, store in u.
-		__asm("mov t, #0x00");//	set t to zero.
-		
-		
-		temp1 = ((digit_t*)p503p1)[15];		
-		__asm("umull UV[0], UV[1], temp1, mc[13]");//	round 2: ii=28, jj=13;	multiply 16th dgt of p503p1 w/ 14th dgt of C.
-		__asm("adds v, v, UV[0]");//	add LSB to v, store in v.
-		__asm("adcs u, u, UV[1]");//	add MSB to u, store in u.
-		__asm("adcs t, t, #0x00");//	add carry to t, store in t.	
-
-		temp1 = ((digit_t*)p503p1)[14];
-		__asm("umull UV[0], UV[1], temp1, mc[14]");//	round 2: ii=28, jj=14;	multiply 15th dgt of p503p1 w/ 15th dgt of C.
-		__asm("adds v, v, UV[0]");//	add LSB to v, store in v.
-		__asm("adcs u, u, UV[1]");//	add MSB to u, store in u.
-		__asm("adcs t, t, #0x00");//	add carry to t, store in t.
-		
-		temp1 = ((digit_t*)p503p1)[13];		
-		__asm("umull UV[0], UV[1], temp1, mc[15]");//	round 2: ii=28, jj=15;	multiply 14th dgt of p503p1 w/ 16th dgt of C.
-		__asm("adds v, v, UV[0]");//	add LSB to v, store in v.
-		__asm("adcs u, u, UV[1]");//	add MSB to u, store in u.
-		__asm("adcs t, t, #0x00");//	add carry to t, store in t.		
-		
-		__asm("adds mc[12], v, ma[28]");//	round 2: ii=28, jj=16;	add v to 29th dgt of A, store in 13th dgt of C.
-		__asm("adcs v, u, #0x00");//	add carry to u, store in v.
-		__asm("adcs u, t, #0x00");//	add carry to t, store in u.
-		__asm("mov t, #0x00");//	set t to zero.
-
-
-		temp1 = ((digit_t*)p503p1)[15];
-		__asm("umull UV[0], UV[1], temp1, mc[14]");//	round 2: ii=29, jj=14;	multiply 16th dgt of p503p1 w/ 15th dgt of C.
-		__asm("adds v, v, UV[0]");//	add LSB to v, store in v.
-		__asm("adcs u, u, UV[1]");//	add MSB to u, store in u.
-		__asm("adcs t, t, #0x00");//	add carry to t, store in t.		
-		
-		temp1 = ((digit_t*)p503p1)[14];		
-		__asm("umull UV[0], UV[1], temp1, mc[15]");//	round 2: ii=29, jj=15;	multiply 15th dgt of p503p1 w/ 16th dgt of C.
-		__asm("adds v, v, UV[0]");//	add LSB to v, store in v.
-		__asm("adcs u, u, UV[1]");//	add MSB to u, store in u.
-		__asm("adcs t, t, #0x00");//	add carry to t, store in t.
-
-		__asm("adds mc[13], v, ma[29]");//	round 2: ii=29, jj=16;	add v to 30th dgt of A, store in 14th dgt of C.
-		__asm("adcs v, u, #0x00");//	add carry to u, store in v.
-		__asm("adcs u, t, #0x00");//	add carry to t, store in u.
-		__asm("mov t, #0x00");//	set t to zero.
-		
-		
-		temp1 = ((digit_t*)p503p1)[15];		
-		__asm("umull UV[0], UV[1], temp1, mc[15]");//	round 2: ii=30, jj=15;	multiply 16th dgt of p503p1 w/ 16th dgt of C.
-		__asm("adds v, v, UV[0]");//	add LSB to v, store in v.
-		__asm("adcs u, u, UV[1]");//	add MSB to u, store in u.
-		__asm("adcs t, t, #0x00");//	add carry to t, store in t.	
-
-		__asm("adds mc[14], v, ma[30]");//	round 2: ii=30, jj=16;	add v to 31st dgt of A, store in 15th dgt of C.
-		__asm("adcs v, u, #0x00");//	add carry to u, store in v.
-		__asm("adcs u, t, #0x00");//	add carry to t, store in u.
-		__asm("mov t, #0x00");//	set t to zero.
-		
-		__asm("adds mc[15], v, ma[31]");
-		
-//	
-//    for (i = 0; i < NWORDS_FIELD; i++) {
-//        for (j = 0; j < i; j++) {
-//            if (j < (i-p503_ZERO_WORDS+1)) { 
-//							temp1 = ((digit_t*)p503p1)[i-j];
-//               // MUL(mc[j], ((digit_t*)p503p1)[i-j], UV+1, UV[0]);
-//								__asm("umull UV[0],UV[1],mc[j],temp1");
-//                //ADDC(0, UV[0], v, carry, v); 
-//                //ADDC(carry, UV[1], u, carry, u); 
-//                //t += carry; 
-//							__asm("adds v,v,UV[0]");
-//							__asm("adcs u,u,UV[1]");
-//							__asm("adcs t,t,#0x00");
-//            }
-//        }
-//        //ADDC(0, v, ma[i], carry, v); 
-//        //ADDC(carry, u, 0, carry, u); 				
-//       //t += carry; 
-//				__asm("adds v,v,ma[i]");
-//				__asm("adcs u,u,#0x00");
-//				__asm("adcs t,t,#0x00");
-//        mc[i] = v;
-//        v = u;
-//        u = t;
-//        t = 0;
-//    }    
-
-//    for (i = NWORDS_FIELD; i < 2*NWORDS_FIELD-1; i++) {
-//        if (count > 0) {
-//            count -= 1;
-//        }
-//        for (j = i-NWORDS_FIELD+1; j < NWORDS_FIELD; j++) {
-//            if (j < (NWORDS_FIELD-count)) { 
-//							temp1 = ((digit_t*)p503p1)[i-j];
-//              //  MUL(mc[j], ((digit_t*)p503p1)[i-j], UV+1, UV[0]);
-//							__asm("umull UV[0],UV[1],mc[j],temp1");
-//                //ADDC(0, UV[0], v, carry, v); 
-//                //ADDC(carry, UV[1], u, carry, u); 
-//                //t += carry;
-//							__asm("adds v,v,UV[0]");
-//							__asm("adcs u,u,UV[1]");
-//							__asm("adcs t,t,#0x00");
-//            }
-//        }
-//        //ADDC(0, v, ma[i], carry, v); 
-//        //ADDC(carry, u, 0, carry, u); 
-//        //t += carry; 
-//				__asm("adds v,v,ma[i]");
-//				__asm("adcs u,u,#0x00");
-//				__asm("adcs t,t,#0x00");
-//        mc[i-NWORDS_FIELD] = v;
-//        v = u;
-//        u = t;
-//        t = 0;
-//    }
-//    //ADDC(0, v, ma[2*NWORDS_FIELD-1], carry, v); 
-//		__asm("adds v,v,ma[31]");		// ma[2*NWORDS_FIELD-1]
-//    //mc[NWORDS_FIELD-1] = v;
-//		mc[15] = v;
 }

@@ -1,9 +1,13 @@
+#include <stdint.h>
+#include <stdbool.h>
 #include <stdio.h>
 #include <string.h>
 #include "random.h"
 #include "fips202.h"
 #include "P503_internal.h"
 #include "P503_api.h"
+
+
 
 
 extern void multiply32x32_asm (digit_t a, digit_t b, digit_t* c);
@@ -41,14 +45,35 @@ digit_t temp2[16];
 	test_high(temp2,c);
 }
 	
+unsigned long cycles(void) { 
+       volatile uint32_t *DWT_CYCCNT = (uint32_t *)0xE0001004; 
+	
+        return *DWT_CYCCNT; 
+}
+
+
 int main()
-{
+{	
 	unsigned char PrivateKeyA[SIDH_SECRETKEYBYTES] = { 0x54, 0x55, 0x55, 0x55,0x55, 0x55, 0x56, 0x78,0x12, 0x34, 0x56, 0x78,0x12, 0x34, 0x56, 0x78,0x12, 0x34, 0x56, 0x78,0x12, 0x34, 0x56, 0x78,0x12, 0x34, 0x56, 0x78,0x12, 0x34, 0x56, 0x78 };//dummy values
 	unsigned char PublicKeyA[SIDH_PUBLICKEYBYTES];
 	unsigned char PrivateKeyB[SIDH_SECRETKEYBYTES] = { 0x98, 0x76, 0x54, 0x32,0x98, 0x76, 0x54, 0x32,0x98, 0x76, 0x54, 0x32,0x98, 0x76, 0x54, 0x32,0x98, 0x76, 0x54, 0x32,0x98, 0x76, 0x54, 0x32,0x98, 0x76, 0x54, 0x32,0x98, 0x76, 0x54, 0x32 };//dummy values
 	unsigned char PublicKeyB[SIDH_PUBLICKEYBYTES];
 	unsigned char SharedSecretA[SIDH_BYTES], SharedSecretB[SIDH_BYTES];
-
+		
+//	1. Enable the UART module using the RCGCUART register (see page 395).
+		
+		
+//2. Enable the clock to the appropriate GPIO module via the RCGCGPIO register (see page 389).
+//To find out which GPIO port to enable, refer to Table 29-5 on page 1932.
+//3. Set the GPIO AFSEL bits for the appropriate pins (see page 778). To determine which GPIOs to
+//configure, see Table 29-4 on page 1921.
+//4. Configure the GPIO current level and/or slew rate as specified for the mode selected (see
+//page 780 and page 788).
+//5. Configure the PMCn fields in the GPIOPCTL register to assign the UART signals to the appropriate
+//pins (see page 795 and Table 29-5 on page 1932).
+	
+		
+		
 	EphemeralKeyGeneration_A(PrivateKeyA, PublicKeyA);
 	EphemeralKeyGeneration_B(PrivateKeyB, PublicKeyB);
 	EphemeralSecretAgreement_A(PrivateKeyA, PublicKeyB, SharedSecretA); 
